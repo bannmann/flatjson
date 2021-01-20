@@ -3,6 +3,8 @@ package org.zalando.flatjson;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.zalando.flatjson.text.StringText;
+
 class JsonMap<K, V> extends LinkedHashMap<K, V>
 {
     @Override
@@ -10,14 +12,16 @@ class JsonMap<K, V> extends LinkedHashMap<K, V>
     {
         StringBuilder result = new StringBuilder("{");
         int count = 0;
-        for (Map.Entry entry : entrySet())
+        for (Map.Entry<K, V> entry : entrySet())
         {
             if (count > 0)
             {
                 result.append(",");
             }
-            String key = StringCodec.escape((String) entry.getKey());
-            result.append(String.format("\"%s\":%s", key, entry.getValue()));
+            StringText unescapedKey = new StringText((String) entry.getKey());
+            String escapedKey = StringCodec.escape(unescapedKey)
+                .asString();
+            result.append(String.format("\"%s\":%s", escapedKey, entry.getValue()));
             count++;
         }
         result.append("}");

@@ -3,11 +3,13 @@ package org.zalando.flatjson;
 import java.util.List;
 import java.util.Map;
 
+import org.zalando.flatjson.text.Text;
+
 class Parsed extends Json
 {
     static class Strng extends Parsed
     {
-        private String string;
+        private Text text;
 
         Strng(Overlay overlay, int element)
         {
@@ -20,14 +22,25 @@ class Parsed extends Json
             return true;
         }
 
+        private Text getText()
+        {
+            if (text == null)
+            {
+                text = overlay.getUnescapedString(element);
+            }
+            return text;
+        }
+
         @Override
         public String asString()
         {
-            if (string == null)
-            {
-                string = overlay.getUnescapedString(element);
-            }
-            return string;
+            return getText().asString();
+        }
+
+        @Override
+        public char[] asCharArray()
+        {
+            return getText().asCharArray();
         }
     }
 
@@ -54,12 +67,6 @@ class Parsed extends Json
                 array = createArray();
             }
             return array;
-        }
-
-        @Override
-        public String toString()
-        {
-            return (array == null) ? super.toString() : array.toString();
         }
 
         private List<Json> createArray()
@@ -100,19 +107,14 @@ class Parsed extends Json
             return map;
         }
 
-        @Override
-        public String toString()
-        {
-            return (map == null) ? super.toString() : map.toString();
-        }
-
         private Map<String, Json> createMap()
         {
             Map<String, Json> result = new JsonMap<>();
             int e = element + 1;
             while (e <= element + overlay.getNested(element))
             {
-                String key = overlay.getUnescapedString(e);
+                String key = overlay.getUnescapedString(e)
+                    .asString();
                 result.put(key, create(overlay, e + 1));
                 e += overlay.getNested(e + 1) + 2;
             }
@@ -136,8 +138,8 @@ class Parsed extends Json
     }
 
     @Override
-    public String toString()
+    public final String toString()
     {
-        return overlay.getJson(element);
+        return getClass().getSimpleName();
     }
 }

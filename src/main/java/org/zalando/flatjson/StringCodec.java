@@ -1,10 +1,13 @@
 package org.zalando.flatjson;
 
+import org.zalando.flatjson.text.Text;
+import org.zalando.flatjson.text.TextBuilder;
+
 class StringCodec
 {
-    static String escape(String input)
+    static Text escape(Text input)
     {
-        StringBuilder result = new StringBuilder(input.length());
+        TextBuilder result = new TextBuilder(input.length());
         int i = 0;
         while (i < input.length())
         {
@@ -12,30 +15,31 @@ class StringCodec
             switch (c)
             {
                 case '\\':
-                    result.append("\\\\");
+                    result.append('\\', '\\');
                     break;
                 case '"':
-                    result.append("\\\"");
+                    result.append('\\', '\"');
                     break;
                 case '\b':
-                    result.append("\\b");
+                    result.append('\\', 'b');
                     break;
                 case '\f':
-                    result.append("\\f");
+                    result.append('\\', 'f');
                     break;
                 case '\n':
-                    result.append("\\n");
+                    result.append('\\', 'n');
                     break;
                 case '\r':
-                    result.append("\\r");
+                    result.append('\\', 'r');
                     break;
                 case '\t':
-                    result.append("\\t");
+                    result.append('\\', 't');
                     break;
                 default:
                     if (c < 32 || c > 126)
                     {
-                        result.append("\\u" + Integer.toUnsignedString(c, 16));
+                        result.append('\\', 'u');
+                        result.append(Integer.toUnsignedString(c, 16));
                     }
                     else
                     {
@@ -44,12 +48,12 @@ class StringCodec
             }
             i++;
         }
-        return result.toString();
+        return result.build();
     }
 
-    static String unescape(String input)
+    static Text unescape(Text input)
     {
-        StringBuilder result = new StringBuilder(input.length());
+        TextBuilder result = new TextBuilder(input.length());
         int i = 0;
         while (i < input.length())
         {
@@ -84,7 +88,8 @@ class StringCodec
                         break;
                     case 'u':
                     {
-                        result.append(Character.toChars(Integer.parseInt(input.substring(i + 1, i + 5), 16)));
+                        result.append(Character.toChars(Integer.parseInt(input.getPart(i + 1, i + 5)
+                            .asString(), 16)));
                         i += 4;
                     }
                 }
@@ -95,6 +100,6 @@ class StringCodec
             }
             i++;
         }
-        return result.toString();
+        return result.build();
     }
 }

@@ -5,6 +5,10 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
+import org.zalando.flatjson.text.CharArrayText;
+import org.zalando.flatjson.text.StringText;
+import org.zalando.flatjson.text.Text;
+
 class Literal extends Json
 {
     static class Null extends Literal
@@ -128,11 +132,16 @@ class Literal extends Json
 
     static class Strng extends Literal
     {
-        private final String string;
+        private final Text text;
 
         Strng(String string)
         {
-            this.string = string;
+            this.text = new StringText(string);
+        }
+
+        Strng(char[] chars)
+        {
+            this.text = new CharArrayText(chars);
         }
 
         @Override
@@ -144,19 +153,25 @@ class Literal extends Json
         @Override
         public String asString()
         {
-            return string;
+            return text.asString();
+        }
+
+        @Override
+        public char[] asCharArray()
+        {
+            return text.asCharArray();
         }
 
         @Override
         public void accept(Visitor visitor)
         {
-            visitor.visitString(string);
+            visitor.visitString(text.asCharArray());
         }
 
         @Override
         public String toString()
         {
-            return String.format("\"%s\"", StringCodec.escape(string));
+            return String.format("\"%s\"", StringCodec.escape(text));
         }
     }
 
@@ -226,7 +241,8 @@ class Literal extends Json
             visitor.beginObject();
             for (Map.Entry<String, Json> entry : map.entrySet())
             {
-                visitor.visitString(entry.getKey());
+                visitor.visitString(entry.getKey()
+                    .toCharArray());
                 entry.getValue()
                     .accept(visitor);
             }

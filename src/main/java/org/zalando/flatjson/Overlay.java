@@ -3,6 +3,10 @@ package org.zalando.flatjson;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.zalando.flatjson.text.CharArrayText;
+import org.zalando.flatjson.text.StringText;
+import org.zalando.flatjson.text.Text;
+
 class Overlay
 {
     static int calculateBlockSize(int rawChars)
@@ -17,20 +21,30 @@ class Overlay
     private static final int TO = 2;
     private static final int NESTED = 3;
 
-    private final String raw;
+    private final Text text;
     private final List<int[]> blocks;
     private final int blockSize;
     private int element;
 
     Overlay(String raw)
     {
-        if (raw == null)
+        this(new StringText(raw));
+    }
+
+    Overlay(char[] raw)
+    {
+        this(new CharArrayText(raw));
+    }
+
+    private Overlay(Text text)
+    {
+        if (text == null)
         {
             throw new ParseException("cannot parse null");
         }
-        this.raw = raw;
+        this.text = text;
         this.blocks = new ArrayList<>();
-        this.blockSize = calculateBlockSize(raw.length());
+        this.blockSize = calculateBlockSize(text.length());
         this.element = 0;
         parse();
     }
@@ -45,14 +59,14 @@ class Overlay
         return getComponent(element, NESTED);
     }
 
-    String getJson(int element)
+    Text getJson(int element)
     {
-        return raw.substring(getComponent(element, FROM), getComponent(element, TO) + 1);
+        return text.getPart(getComponent(element, FROM), getComponent(element, TO) + 1);
     }
 
-    String getUnescapedString(int element)
+    Text getUnescapedString(int element)
     {
-        String value = raw.substring(getComponent(element, FROM) + 1, getComponent(element, TO));
+        Text value = text.getPart(getComponent(element, FROM) + 1, getComponent(element, TO));
         return (getType(element) == Json.Type.STRING_ESCAPED) ? StringCodec.unescape(value) : value;
     }
 
@@ -71,11 +85,11 @@ class Overlay
                 visitor.visitBoolean(false);
                 break;
             case NUMBER:
-                visitor.visitNumber(getJson(element));
+                visitor.visitNumber(getJson(element).asString());
                 break;
             case STRING_ESCAPED:
             case STRING:
-                visitor.visitString(getUnescapedString(element));
+                visitor.visitString(getUnescapedString(element).asCharArray());
                 break;
             case ARRAY:
                 acceptArray(element, visitor);
@@ -106,8 +120,8 @@ class Overlay
         int e = element + 1;
         while (e <= element + getNested(element))
         {
-            String key = getUnescapedString(e);
-            visitor.visitString(key);
+            Text key = getUnescapedString(e);
+            visitor.visitString(key.asCharArray());
             accept(e + 1, visitor);
             e += getNested(e + 1) + 2;
         }
@@ -119,7 +133,7 @@ class Overlay
         try
         {
             int last = skipWhitespace(parseValue(0));
-            if (last != raw.length())
+            if (last != text.length())
             {
                 throw new ParseException("malformed json");
             }
@@ -133,7 +147,7 @@ class Overlay
     private int parseValue(int i)
     {
         i = skipWhitespace(i);
-        switch (raw.charAt(i))
+        switch (text.charAt(i))
         {
             case '"':
                 return parseString(i);
@@ -171,9 +185,9 @@ class Overlay
         boolean leadingZero = false;
         boolean dot = false;
         boolean exponent = false;
-        while (i < raw.length())
+        while (i < text.length())
         {
-            char c = raw.charAt(i);
+            char c = text.charAt(i);
             if (c == '-')
             {
                 if (i > from)
@@ -190,10 +204,10 @@ class Overlay
                 }
                 leadingZero = false;
                 exponent = true;
-                c = raw.charAt(i + 1);
+                c = text.charAt(i + 1);
                 if (c == '-' || c == '+')
                 {
-                    c = raw.charAt(i + 2);
+                    c = text.charAt(i + 2);
                     if (c < '0' || c > '9')
                     {
                         throw new ParseException("invalid exponent");
@@ -255,7 +269,7 @@ class Overlay
         int from = i++;
         while (true)
         {
-            char c = raw.charAt(i);
+            char c = text.charAt(i);
             if (c == '"')
             {
                 Json.Type type = escaped ? Json.Type.STRING_ESCAPED : Json.Type.STRING;
@@ -268,7 +282,7 @@ class Overlay
             else if (c == '\\')
             {
                 escaped = true;
-                c = raw.charAt(i + 1);
+                c = text.charAt(i + 1);
                 if (c == '"' || c == '/' || c == '\\' || c == 'b' || c == 'f' || c == 'n' || c == 'r' || c == 't')
                 {
                     i++;
@@ -299,7 +313,7 @@ class Overlay
         while (true)
         {
             i = skipWhitespace(i);
-            if (raw.charAt(i) == ']')
+            if (text.charAt(i) == ']')
             {
                 return closeElement(e, i, element - e - 1);
             }
@@ -322,7 +336,7 @@ class Overlay
         while (true)
         {
             i = skipWhitespace(i);
-            if (raw.charAt(i) == '}')
+            if (text.charAt(i) == '}')
             {
                 return closeElement(e, i, element - e - 1);
             }
@@ -368,9 +382,9 @@ class Overlay
 
     private int skipWhitespace(int i)
     {
-        while (i < raw.length())
+        while (i < text.length())
         {
-            char c = raw.charAt(i);
+            char c = text.charAt(i);
             if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
             {
                 break;
@@ -382,7 +396,7 @@ class Overlay
 
     private void expectChar(int i, char c)
     {
-        if (raw.charAt(i) != c)
+        if (text.charAt(i) != c)
         {
             throw new ParseException("expected char '" + c + "' at pos " + i);
         }
@@ -390,7 +404,7 @@ class Overlay
 
     private void expectHex(int i)
     {
-        char c = raw.charAt(i);
+        char c = text.charAt(i);
         if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
         {
             return;

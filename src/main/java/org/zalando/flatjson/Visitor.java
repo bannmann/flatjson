@@ -8,7 +8,7 @@ public interface Visitor
 
     void visitNumber(String value);
 
-    void visitString(String value);
+    void visitString(char[] value);
 
     void beginArray();
 

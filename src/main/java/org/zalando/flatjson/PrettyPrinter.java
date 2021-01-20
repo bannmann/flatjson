@@ -2,6 +2,9 @@ package org.zalando.flatjson;
 
 import java.util.Stack;
 
+import org.zalando.flatjson.text.CharArrayText;
+import org.zalando.flatjson.text.Text;
+
 class PrettyPrinter implements Visitor
 {
     private enum Type
@@ -53,9 +56,12 @@ class PrettyPrinter implements Visitor
     }
 
     @Override
-    public void visitString(String value)
+    public void visitString(char[] value)
     {
-        append(String.format("\"%s\"", StringCodec.escape(value)));
+        Text input = new CharArrayText(value);
+        append(String.format("\"%s\"",
+            StringCodec.escape(input)
+                .asString()));
     }
 
     @Override

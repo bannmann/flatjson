@@ -35,9 +35,11 @@ public class Json
                 return new Literal.Null();
             case TRUE:
             case FALSE:
-                return new Literal.Bool(Boolean.valueOf(overlay.getJson(element)));
+                return new Literal.Bool(Boolean.parseBoolean(overlay.getJson(element)
+                    .asString()));
             case NUMBER:
-                return new Literal.Number(overlay.getJson(element));
+                return new Literal.Number(overlay.getJson(element)
+                    .asString());
             case STRING_ESCAPED:
             case STRING:
                 return new Parsed.Strng(overlay, element);
@@ -171,6 +173,11 @@ public class Json
     }
 
     public String asString()
+    {
+        throw new IllegalStateException("not a string");
+    }
+
+    public char[] asCharArray()
     {
         throw new IllegalStateException("not a string");
     }
