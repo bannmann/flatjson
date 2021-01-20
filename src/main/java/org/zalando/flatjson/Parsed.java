@@ -3,51 +3,71 @@ package org.zalando.flatjson;
 import java.util.List;
 import java.util.Map;
 
-class Parsed extends Json {
-
-    static class Strng extends Parsed {
-
+class Parsed extends Json
+{
+    static class Strng extends Parsed
+    {
         private String string;
 
-        Strng(Overlay overlay, int element) {
+        Strng(Overlay overlay, int element)
+        {
             super(overlay, element);
         }
 
-        @Override public boolean isString() {
+        @Override
+        public boolean isString()
+        {
             return true;
         }
 
-        @Override public String asString() {
-            if (string == null) string = overlay.getUnescapedString(element);
+        @Override
+        public String asString()
+        {
+            if (string == null)
+            {
+                string = overlay.getUnescapedString(element);
+            }
             return string;
         }
     }
 
-    static class Array extends Parsed {
-
+    static class Array extends Parsed
+    {
         private List<Json> array;
 
-        Array(Overlay overlay, int element) {
+        Array(Overlay overlay, int element)
+        {
             super(overlay, element);
         }
 
-        @Override public boolean isArray() {
+        @Override
+        public boolean isArray()
+        {
             return true;
         }
 
-        @Override public List<Json> asArray() {
-            if (array == null) array = createArray();
+        @Override
+        public List<Json> asArray()
+        {
+            if (array == null)
+            {
+                array = createArray();
+            }
             return array;
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString()
+        {
             return (array == null) ? super.toString() : array.toString();
         }
 
-        private List<Json> createArray() {
+        private List<Json> createArray()
+        {
             List<Json> result = new JsonList<>();
             int e = element + 1;
-            while (e <= element + overlay.getNested(element)) {
+            while (e <= element + overlay.getNested(element))
+            {
                 result.add(create(overlay, e));
                 e += overlay.getNested(e) + 1;
             }
@@ -55,31 +75,43 @@ class Parsed extends Json {
         }
     }
 
-    static class Object extends Parsed {
-
+    static class Object extends Parsed
+    {
         private Map<String, Json> map;
 
-        Object(Overlay overlay, int element) {
+        Object(Overlay overlay, int element)
+        {
             super(overlay, element);
         }
 
-        @Override public boolean isObject() {
+        @Override
+        public boolean isObject()
+        {
             return true;
         }
 
-        @Override public Map<String, Json> asObject() {
-            if (map == null) map = createMap();
+        @Override
+        public Map<String, Json> asObject()
+        {
+            if (map == null)
+            {
+                map = createMap();
+            }
             return map;
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString()
+        {
             return (map == null) ? super.toString() : map.toString();
         }
 
-        private Map<String, Json> createMap() {
+        private Map<String, Json> createMap()
+        {
             Map<String, Json> result = new JsonMap<>();
             int e = element + 1;
-            while (e <= element + overlay.getNested(element)) {
+            while (e <= element + overlay.getNested(element))
+            {
                 String key = overlay.getUnescapedString(e);
                 result.put(key, create(overlay, e + 1));
                 e += overlay.getNested(e + 1) + 2;
@@ -91,16 +123,21 @@ class Parsed extends Json {
     protected final Overlay overlay;
     protected final int element;
 
-    Parsed(Overlay overlay, int element) {
+    Parsed(Overlay overlay, int element)
+    {
         this.overlay = overlay;
         this.element = element;
     }
 
-    @Override public void accept(Visitor visitor) {
+    @Override
+    public void accept(Visitor visitor)
+    {
         overlay.accept(element, visitor);
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString()
+    {
         return overlay.getJson(element);
     }
 }

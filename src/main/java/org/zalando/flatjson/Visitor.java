@@ -1,7 +1,7 @@
 package org.zalando.flatjson;
 
-public interface Visitor {
-
+public interface Visitor
+{
     void visitNull();
 
     void visitBoolean(boolean value);

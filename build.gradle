@@ -14,89 +14,89 @@ mainClassName = 'org.zalando.flatjson.Main'
 // (or close and promote manually on oss.sonatype.org)
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenCentral()
     }
-    mavenCentral()
-  }
-  dependencies {
-    classpath 'me.champeau.gradle:jmh-gradle-plugin:0.3.1'
-    classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-  }
+    dependencies {
+        classpath 'me.champeau.gradle:jmh-gradle-plugin:0.3.1'
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+    }
 }
 
 dependencies {
-  testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.11'
 
-  jmh 'org.openjdk.jmh:jmh-core:1.17.4'
-  jmh 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
-  jmh 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
-  jmh 'com.google.code.gson:gson:2.8.0'
-  jmh 'io.fastjson:boon:0.34'
+    jmh 'org.openjdk.jmh:jmh-core:1.17.4'
+    jmh 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+    jmh 'com.fasterxml.jackson.core:jackson-databind:2.2.3'
+    jmh 'com.google.code.gson:gson:2.8.0'
+    jmh 'io.fastjson:boon:0.34'
 }
 
 task javadocJar(type: Jar) {
-  classifier = 'javadoc'
-  from javadoc
+    classifier = 'javadoc'
+    from javadoc
 }
 
 task sourcesJar(type: Jar) {
-  classifier = 'sources'
-  from sourceSets.main.allSource
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 artifacts {
-  archives javadocJar, sourcesJar
+    archives javadocJar, sourcesJar
 }
 
 signing {
-  sign configurations.archives
+    sign configurations.archives
 }
 
 uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: project.findProperty('ossrhUsername'), password: project.findProperty('ossrhPassword'))
-      }
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: project.findProperty('ossrhUsername'), password: project.findProperty('ossrhPassword'))
+            }
 
-      pom.project {
-        name 'flatjson'
-        packaging 'jar'
-        artifactId 'flatjson'
-        description 'A fast JSON parser.'
-        url 'https://github.com/zalando-incubator/flatjson'
+            pom.project {
+                name 'flatjson'
+                packaging 'jar'
+                artifactId 'flatjson'
+                description 'A fast JSON parser.'
+                url 'https://github.com/zalando-incubator/flatjson'
 
-        scm {
-          connection 'scm:git:https://github.com/zalando-incubator/flatjson.git'
-          developerConnection 'scm:git:https://github.com/zalando-incubator/flatjson.git'
-          url 'https://github.com/zalando-incubator/flatjson'
+                scm {
+                    connection 'scm:git:https://github.com/zalando-incubator/flatjson.git'
+                    developerConnection 'scm:git:https://github.com/zalando-incubator/flatjson.git'
+                    url 'https://github.com/zalando-incubator/flatjson'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'tlossen'
+                        name 'Tim Lossen'
+                        email 'tim@lossen.de'
+                    }
+                }
+            }
         }
-
-        licenses {
-          license {
-            name 'MIT License'
-            url 'https://opensource.org/licenses/MIT'
-          }
-        }
-
-        developers {
-          developer {
-            id 'tlossen'
-            name 'Tim Lossen'
-            email 'tim@lossen.de'
-          }
-        }
-      }
     }
-  }
 }
 
 
