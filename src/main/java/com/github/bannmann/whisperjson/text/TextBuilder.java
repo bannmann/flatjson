@@ -1,38 +1,40 @@
 package com.github.bannmann.whisperjson.text;
 
-public class TextBuilder
+public class TextBuilder implements AutoCloseable
 {
-    private final char[] contents;
-    private int position;
+    private final StringBuilder contents;
 
-    public TextBuilder(int capacity)
+    public TextBuilder()
     {
-        contents = new char[capacity];
-        position = 0;
+        this(0);
+    }
+
+    public TextBuilder(int initialCapacity)
+    {
+        contents = new StringBuilder(initialCapacity);
     }
 
     public void append(char... characters)
     {
-        for (char character : characters)
-        {
-            contents[position++] = character;
-        }
+        contents.append(characters);
     }
 
-    public void append(String string)
+    public void append(CharSequence charSequence)
     {
-        for (int i = 0; i < string.length(); i++)
-        {
-            append(string.charAt(i));
-        }
+        contents.append(charSequence);
     }
 
     public Text build()
     {
-        int length = position;
+        int length = contents.length();
         char[] result = new char[length];
-
-        System.arraycopy(contents, 0, result, 0, length);
+        contents.getChars(0, length, result, 0);
         return new CharArrayText(result);
+    }
+
+    @Override
+    public void close()
+    {
+        contents.setLength(0);
     }
 }

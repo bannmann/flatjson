@@ -40,6 +40,14 @@ public class EscapeTest
     }
 
     @Test
+    public void escapeFoo()
+    {
+        String expected = "\\b";
+        String actual = invokeEscape("\b");
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void escapeControlChars()
     {
         assertEquals("\\b\\f\\n\\r\\t", invokeEscape("\b\f\n\r\t"));
