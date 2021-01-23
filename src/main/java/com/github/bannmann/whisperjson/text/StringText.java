@@ -1,9 +1,34 @@
 package com.github.bannmann.whisperjson.text;
 
+import java.util.Iterator;
+
 import com.github.bannmann.whisperjson.ParseException;
 
-public class StringText implements Text
+public class StringText extends Text
 {
+    private static class CharacterIterator implements Iterator<Character>
+    {
+        private final String string;
+        private int position;
+
+        private CharacterIterator(String string)
+        {
+            this.string = string;
+        }
+
+        @Override
+        public boolean hasNext()
+        {
+            return position < string.length();
+        }
+
+        @Override
+        public Character next()
+        {
+            return string.charAt(position++);
+        }
+    }
+
     private final String contents;
 
     public StringText(String contents)
@@ -44,5 +69,11 @@ public class StringText implements Text
     public String asString()
     {
         return contents;
+    }
+
+    @Override
+    public Iterator<Character> getCharacters()
+    {
+        return new CharacterIterator(contents);
     }
 }

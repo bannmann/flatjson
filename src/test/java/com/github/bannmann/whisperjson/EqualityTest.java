@@ -11,7 +11,7 @@ public class EqualityTest
     {
         assertEquals(Json.value((String) null), Json.value((String) null));
         assertEquals(Json.value((String) null), Json.parse("null"));
-        assertEquals(Json.value((String) null), Json.NULL);
+        assertEquals(Json.value((String) null), Literal.Null.INSTANCE);
     }
 
     @Test
@@ -19,7 +19,7 @@ public class EqualityTest
     {
         assertEquals(Json.value(true), Json.value(true));
         assertEquals(Json.value(true), Json.parse("true"));
-        assertEquals(Json.value(true), Json.TRUE);
+        assertEquals(Json.value(true), Literal.Bool.TRUE);
     }
 
     @Test
@@ -27,7 +27,7 @@ public class EqualityTest
     {
         assertEquals(Json.value(false), Json.value(false));
         assertEquals(Json.value(false), Json.parse("false"));
-        assertEquals(Json.value(false), Json.FALSE);
+        assertEquals(Json.value(false), Literal.Bool.FALSE);
     }
 
     @Test

@@ -8,12 +8,6 @@ import java.util.Map;
 
 public class Json
 {
-    public static final String DEFAULT_INDENT = "  ";
-
-    public static final Json NULL = new Literal.Null();
-    public static final Json TRUE = new Literal.Bool(true);
-    public static final Json FALSE = new Literal.Bool(false);
-
     enum Type
     {
         NULL,
@@ -32,11 +26,11 @@ public class Json
         switch (type)
         {
             case NULL:
-                return new Literal.Null();
+                return Literal.Null.INSTANCE;
             case TRUE:
+                return Literal.Bool.TRUE;
             case FALSE:
-                return new Literal.Bool(Boolean.parseBoolean(overlay.getJson(element)
-                    .asString()));
+                return Literal.Bool.FALSE;
             case NUMBER:
                 return new Literal.Number(overlay.getJson(element)
                     .asString());
@@ -59,7 +53,7 @@ public class Json
 
     public static Json value(boolean value)
     {
-        return new Literal.Bool(value);
+        return Literal.Bool.valueOf(value);
     }
 
     public static Json value(int value)
@@ -84,17 +78,17 @@ public class Json
 
     public static Json value(BigInteger value)
     {
-        return (value == null) ? new Literal.Null() : new Literal.Number(value.toString());
+        return (value == null) ? Literal.Null.INSTANCE : new Literal.Number(value.toString());
     }
 
     public static Json value(BigDecimal value)
     {
-        return (value == null) ? new Literal.Null() : new Literal.Number(value.toString());
+        return (value == null) ? Literal.Null.INSTANCE : new Literal.Number(value.toString());
     }
 
     public static Json value(String value)
     {
-        return (value == null) ? new Literal.Null() : new Literal.Strng(value);
+        return (value == null) ? Literal.Null.INSTANCE : new Literal.Strng(value);
     }
 
     public static Json array(Json... values)

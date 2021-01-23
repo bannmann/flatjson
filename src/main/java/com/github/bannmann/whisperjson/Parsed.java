@@ -1,7 +1,11 @@
 package com.github.bannmann.whisperjson;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.github.bannmann.whisperjson.text.Text;
 
@@ -42,11 +46,28 @@ class Parsed extends Json
         {
             return getText().asCharArray();
         }
+
+        @Override
+        public boolean equals(java.lang.Object o)
+        {
+            if (o instanceof Json)
+            {
+                Json other = (Json) o;
+                return other.isString() && Arrays.equals(other.asCharArray(), asCharArray());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Arrays.hashCode(asCharArray());
+        }
     }
 
     static class Array extends Parsed
     {
-        private List<Json> array;
+        private List<Json> list;
 
         Array(Overlay overlay, int element)
         {
@@ -62,16 +83,16 @@ class Parsed extends Json
         @Override
         public List<Json> asArray()
         {
-            if (array == null)
+            if (list == null)
             {
-                array = createArray();
+                list = createList();
             }
-            return array;
+            return list;
         }
 
-        private List<Json> createArray()
+        private List<Json> createList()
         {
-            List<Json> result = new JsonList<>();
+            List<Json> result = new ArrayList<>();
             int e = element + 1;
             while (e <= element + overlay.getNested(element))
             {
@@ -79,6 +100,23 @@ class Parsed extends Json
                 e += overlay.getNested(e) + 1;
             }
             return result;
+        }
+
+        @Override
+        public boolean equals(java.lang.Object o)
+        {
+            if (o instanceof Json)
+            {
+                Json other = (Json) o;
+                return other.isArray() && Objects.equals(other.asArray(), asArray());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return asArray().hashCode();
         }
     }
 
@@ -109,7 +147,7 @@ class Parsed extends Json
 
         private Map<String, Json> createMap()
         {
-            Map<String, Json> result = new JsonMap<>();
+            Map<String, Json> result = new LinkedHashMap<>();
             int e = element + 1;
             while (e <= element + overlay.getNested(element))
             {
@@ -119,6 +157,23 @@ class Parsed extends Json
                 e += overlay.getNested(e + 1) + 2;
             }
             return result;
+        }
+
+        @Override
+        public boolean equals(java.lang.Object o)
+        {
+            if (o instanceof Json)
+            {
+                Json other = (Json) o;
+                return other.isObject() && Objects.equals(other.asObject(), asObject());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return asObject().hashCode();
         }
     }
 
