@@ -70,64 +70,6 @@ class Overlay
         return (getType(element) == Json.Type.STRING_ESCAPED) ? StringCodec.unescape(value) : value;
     }
 
-    void accept(int element, Visitor visitor)
-    {
-        Json.Type type = getType(element);
-        switch (type)
-        {
-            case NULL:
-                visitor.visitNull();
-                break;
-            case TRUE:
-                visitor.visitBoolean(true);
-                break;
-            case FALSE:
-                visitor.visitBoolean(false);
-                break;
-            case NUMBER:
-                visitor.visitNumber(getJson(element).asString());
-                break;
-            case STRING_ESCAPED:
-            case STRING:
-                visitor.visitString(getUnescapedString(element).asCharArray());
-                break;
-            case ARRAY:
-                acceptArray(element, visitor);
-                break;
-            case OBJECT:
-                acceptObject(element, visitor);
-                break;
-            default:
-                throw new IllegalStateException("unknown type: " + type);
-        }
-    }
-
-    private void acceptArray(int element, Visitor visitor)
-    {
-        visitor.beginArray();
-        int e = element + 1;
-        while (e <= element + getNested(element))
-        {
-            accept(e, visitor);
-            e += getNested(e) + 1;
-        }
-        visitor.endArray();
-    }
-
-    private void acceptObject(int element, Visitor visitor)
-    {
-        visitor.beginObject();
-        int e = element + 1;
-        while (e <= element + getNested(element))
-        {
-            Text key = getUnescapedString(e);
-            visitor.visitString(key.asCharArray());
-            accept(e + 1, visitor);
-            e += getNested(e + 1) + 2;
-        }
-        visitor.endObject();
-    }
-
     private void parse()
     {
         try

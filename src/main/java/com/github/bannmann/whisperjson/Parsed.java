@@ -185,16 +185,4 @@ class Parsed extends Json
         this.overlay = overlay;
         this.element = element;
     }
-
-    @Override
-    public void accept(Visitor visitor)
-    {
-        overlay.accept(element, visitor);
-    }
-
-    @Override
-    public final String toString()
-    {
-        return getClass().getSimpleName();
-    }
 }

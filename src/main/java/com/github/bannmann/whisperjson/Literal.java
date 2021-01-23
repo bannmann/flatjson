@@ -2,16 +2,7 @@ package com.github.bannmann.whisperjson;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-
-import com.github.bannmann.whisperjson.text.CharArrayText;
-import com.github.bannmann.whisperjson.text.StringText;
-import com.github.bannmann.whisperjson.text.Text;
 
 class Literal extends Json
 {
@@ -27,12 +18,6 @@ class Literal extends Json
         public boolean isNull()
         {
             return true;
-        }
-
-        @Override
-        public void accept(Visitor visitor)
-        {
-            visitor.visitNull();
         }
 
         @Override
@@ -89,12 +74,6 @@ class Literal extends Json
         }
 
         @Override
-        public void accept(Visitor visitor)
-        {
-            visitor.visitBoolean(value);
-        }
-
-        @Override
         public String toString()
         {
             return Boolean.toString(value);
@@ -137,25 +116,25 @@ class Literal extends Json
         @Override
         public int asInt()
         {
-            return Integer.valueOf(value);
+            return Integer.parseInt(value);
         }
 
         @Override
         public long asLong()
         {
-            return Long.valueOf(value);
+            return Long.parseLong(value);
         }
 
         @Override
         public float asFloat()
         {
-            return Float.valueOf(value);
+            return Float.parseFloat(value);
         }
 
         @Override
         public double asDouble()
         {
-            return Double.valueOf(value);
+            return Double.parseDouble(value);
         }
 
         @Override
@@ -171,9 +150,9 @@ class Literal extends Json
         }
 
         @Override
-        public void accept(Visitor visitor)
+        public String toString()
         {
-            visitor.visitNumber(value);
+            return value;
         }
 
         @Override
@@ -191,138 +170,6 @@ class Literal extends Json
         public int hashCode()
         {
             return asBigDecimal().hashCode();
-        }
-    }
-
-    abstract static class SensitiveLiteral extends Literal
-    {
-        @Override
-        public final String toString()
-        {
-            return getClass().getSimpleName();
-        }
-    }
-
-    static class Strng extends SensitiveLiteral
-    {
-        private final Text text;
-
-        Strng(String string)
-        {
-            this.text = new StringText(string);
-        }
-
-        Strng(char[] chars)
-        {
-            this.text = new CharArrayText(chars);
-        }
-
-        @Override
-        public boolean isString()
-        {
-            return true;
-        }
-
-        @Override
-        public String asString()
-        {
-            return text.asString();
-        }
-
-        @Override
-        public char[] asCharArray()
-        {
-            return text.asCharArray();
-        }
-
-        @Override
-        public boolean equals(java.lang.Object o)
-        {
-            if (o instanceof Json)
-            {
-                Json other = (Json) o;
-                return other.isString() && Arrays.equals(other.asCharArray(), asCharArray());
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return Arrays.hashCode(asCharArray());
-        }
-    }
-
-    static class Array extends Literal
-    {
-        private final List<Json> list;
-
-        Array(List<Json> values)
-        {
-            this.list = new ArrayList<>(values);
-        }
-
-        @Override
-        public boolean isArray()
-        {
-            return true;
-        }
-
-        @Override
-        public List<Json> asArray()
-        {
-            return list;
-        }
-
-        @Override
-        public boolean equals(java.lang.Object o)
-        {
-            if (o instanceof Json)
-            {
-                Json other = (Json) o;
-                return other.isArray() && Objects.equals(other.asArray(), asArray());
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return asArray().hashCode();
-        }
-    }
-
-    static class Object extends SensitiveLiteral
-    {
-        private final Map<String, Json> map = new LinkedHashMap<>();
-
-        @Override
-        public boolean isObject()
-        {
-            return true;
-        }
-
-        @Override
-        public Map<String, Json> asObject()
-        {
-            return map;
-        }
-
-        @Override
-        public boolean equals(java.lang.Object o)
-        {
-            if (o instanceof Json)
-            {
-                Json other = (Json) o;
-                return other.isObject() && Objects.equals(other.asObject(), asObject());
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return asObject().hashCode();
         }
     }
 }

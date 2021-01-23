@@ -15,7 +15,7 @@ public class JsonTest
     @Test(expected = ParseException.class)
     public void parseNull()
     {
-        Json.parse(null);
+        Json.parse((String) null);
     }
 
     @Test(expected = ParseException.class)

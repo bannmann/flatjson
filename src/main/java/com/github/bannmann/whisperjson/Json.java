@@ -2,7 +2,6 @@ package com.github.bannmann.whisperjson;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -51,54 +50,9 @@ public class Json
         return create(new Overlay(raw), 0);
     }
 
-    public static Json value(boolean value)
+    public static Json parse(char[] raw)
     {
-        return Literal.Bool.valueOf(value);
-    }
-
-    public static Json value(int value)
-    {
-        return new Literal.Number(Integer.toString(value));
-    }
-
-    public static Json value(long value)
-    {
-        return new Literal.Number(Long.toString(value));
-    }
-
-    public static Json value(float value)
-    {
-        return new Literal.Number(Float.toString(value));
-    }
-
-    public static Json value(double value)
-    {
-        return new Literal.Number(Double.toString(value));
-    }
-
-    public static Json value(BigInteger value)
-    {
-        return (value == null) ? Literal.Null.INSTANCE : new Literal.Number(value.toString());
-    }
-
-    public static Json value(BigDecimal value)
-    {
-        return (value == null) ? Literal.Null.INSTANCE : new Literal.Number(value.toString());
-    }
-
-    public static Json value(String value)
-    {
-        return (value == null) ? Literal.Null.INSTANCE : new Literal.Strng(value);
-    }
-
-    public static Json array(Json... values)
-    {
-        return new Literal.Array(Arrays.asList(values));
-    }
-
-    public static Json object()
-    {
-        return new Literal.Object();
+        return create(new Overlay(raw), 0);
     }
 
     public boolean isNull()
@@ -184,43 +138,5 @@ public class Json
     public Map<String, Json> asObject()
     {
         throw new IllegalStateException("not an object");
-    }
-
-    public void accept(Visitor visitor)
-    {
-        throw new IllegalStateException("not implemented");
-    }
-
-    public String prettyPrint()
-    {
-        return prettyPrint(DEFAULT_INDENT);
-    }
-
-    public String prettyPrint(String indent)
-    {
-        PrettyPrinter printer = new PrettyPrinter(indent);
-        accept(printer);
-        return printer.toString();
-    }
-
-    @Override
-    public boolean equals(Object other)
-    {
-        if (this == other)
-        {
-            return true;
-        }
-        if (!(other instanceof Json))
-        {
-            return false;
-        }
-        Json json = (Json) other;
-        return prettyPrint().equals(json.prettyPrint());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return prettyPrint().hashCode();
     }
 }
