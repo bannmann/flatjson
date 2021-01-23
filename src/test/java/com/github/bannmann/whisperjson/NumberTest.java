@@ -1,89 +1,98 @@
 package com.github.bannmann.whisperjson;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.junit.Test;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 public class NumberTest
 {
-    @Test
-    public void parseZero()
+    @Test(dataProvider = "intVariants")
+    public void parseInt(String label, String input, int expected)
     {
-        ExposedJson json = WhisperJson.parse("0");
-        assertTrue(json.isNumber());
-        assertEquals(0, json.asLong());
+        ExposedJson json = WhisperJson.parse(input);
+
+        assertThat(json).returns(true, Json::isNumber);
+        assertThat(json.asInt()).isEqualTo(expected);
     }
 
-    @Test
-    public void parseZeroWithExponent()
+    @DataProvider
+    public static Object[][] intVariants()
     {
-        ExposedJson json = WhisperJson.parse("0e-23");
-        assertTrue(json.isNumber());
-        assertEquals(0, json.asDouble(), 0);
+        return new Object[][]{
+            new Object[]{ "zero", "0", 0 },
+            new Object[]{ "negative zero", "-0", 0 },
+            new Object[]{ "single digit", "3", 3 },
+            new Object[]{ "positive number", "123", 123 },
+            new Object[]{ "negative number", "-23", -23 }
+        };
     }
 
-    @Test(expected = ParseException.class)
-    public void parseMinus()
+    @Test(dataProvider = "longVariants")
+    public void parseLong(String label, String input, long expected)
     {
-        WhisperJson.parse("-");
+        ExposedJson json = WhisperJson.parse(input);
+
+        assertThat(json).returns(true, Json::isNumber);
+        assertThat(json.asLong()).isEqualTo(expected);
     }
 
-    @Test
-    public void parseNegativeZero()
+    @DataProvider
+    public static Object[][] longVariants()
     {
-        ExposedJson json = WhisperJson.parse("-0");
-        assertTrue(json.isNumber());
-        assertEquals(0, json.asLong());
+        return new Object[][]{
+            new Object[]{ "positive long", "100000000000000023", 100000000000000023L },
+            new Object[]{ "negative long", "-234567898765432", -234567898765432L }
+        };
     }
 
-    @Test
-    public void parseNegativeZeroWithExponent()
+    @Test(dataProvider = "doubleVariants")
+    public void parseDouble(String label, String input, double expected)
     {
-        ExposedJson json = WhisperJson.parse("-0e-2");
-        assertTrue(json.isNumber());
-        assertEquals(0, json.asDouble(), 0);
+        ExposedJson json = WhisperJson.parse(input);
+
+        assertThat(json).returns(true, Json::isNumber);
+        assertThat(json.asDouble()).isCloseTo(expected, within(0.0));
     }
 
-    @Test
-    public void parseSingleDigit()
+    @DataProvider
+    public static Object[][] doubleVariants()
     {
-        ExposedJson json = WhisperJson.parse("3");
-        assertTrue(json.isNumber());
-        assertEquals(3, json.asLong());
+        return new Object[][]{
+            new Object[]{ "zero with exponent", "0e-23", 0 },
+            new Object[]{ "negative zero with exponent", "-0e-2", 0 },
+            new Object[]{ "single digit with exponent", "3e+7", 3e+7 },
+            new Object[]{ "negative number with exponent", "-2e-2", -2e-2 },
+            new Object[]{ "number with exponent", "33e12", 33e12 },
+            new Object[]{ "number with exponent uppercase", "33E12", 33e12 },
+            new Object[]{ "number with exponent plus", "33E+12", 33e12 },
+            new Object[]{ "number with exponent minus", "33E-12", 33e-12 }
+        };
     }
 
-    @Test
-    public void parseSingleDigitWithExponent()
+    @Test(dataProvider = "floatVariants")
+    public void parseFloat(String label, String input, double expected)
     {
-        ExposedJson json = WhisperJson.parse("3e+7");
-        assertTrue(json.isNumber());
-        assertEquals(3e+7, json.asDouble(), 0);
+        ExposedJson json = WhisperJson.parse("3.141");
+
+        assertThat(json).returns(true, Json::isNumber);
+        assertThat((double) json.asFloat()).isCloseTo(3.141, within(0.001));
     }
 
-    @Test(expected = ParseException.class)
-    public void parseNumberWithLeadingZero()
+    @DataProvider
+    public static Object[][] floatVariants()
     {
-        WhisperJson.parse("023");
-    }
-
-    @Test
-    public void parseInteger()
-    {
-        ExposedJson json = WhisperJson.parse("123");
-        assertTrue(json.isNumber());
-        assertEquals(123, json.asInt());
-    }
-
-    @Test
-    public void parseLong()
-    {
-        ExposedJson json = WhisperJson.parse("100000000000000023");
-        assertTrue(json.isNumber());
-        assertEquals(100000000000000023L, json.asLong());
+        return new Object[][]{
+            new Object[]{ "float", "3.141", 3.141 },
+            new Object[]{ "negative float", "-3.141", -3.141 },
+            new Object[]{ "float with exponent", "-3.141e+4", -3.141e4 },
+            new Object[]{ "float with leading zero", "0.33333333", 0.33333333 },
+            new Object[]{ "float with leading zero and exponent", "0.333e4", 0.333e4 }
+        };
     }
 
     @Test
@@ -91,9 +100,10 @@ public class NumberTest
     {
         ExposedJson json = WhisperJson.parse(
             "3.141592653589793238462643383279502884197169399375105820974944592307816406286");
-        assertTrue(json.isNumber());
-        assertEquals(new BigDecimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286"),
-            json.asBigDecimal());
+
+        assertThat(json).returns(true, Json::isNumber);
+        assertThat(json.asBigDecimal()).isEqualTo(new BigDecimal(
+            "3.141592653589793238462643383279502884197169399375105820974944592307816406286"));
     }
 
     @Test
@@ -101,152 +111,32 @@ public class NumberTest
     {
         ExposedJson json = WhisperJson.parse(
             "141592653589793238462643383279502884197169399375105820974944592307816406286");
-        assertTrue(json.isNumber());
-        assertEquals(new BigInteger("141592653589793238462643383279502884197169399375105820974944592307816406286"),
-            json.asBigInteger());
+
+        assertThat(json).returns(true, Json::isNumber);
+        assertThat(json.asBigInteger()).isEqualTo(new BigInteger(
+            "141592653589793238462643383279502884197169399375105820974944592307816406286"));
     }
 
-    @Test
-    public void parseNegativeNumber()
+    @Test(dataProvider = "malformedNumbers", expectedExceptions = ParseException.class)
+    public void parseMalformedNumbers(String label, String input)
     {
-        ExposedJson json = WhisperJson.parse("-23");
-        assertTrue(json.isNumber());
-        assertEquals(-23, json.asLong());
+        WhisperJson.parse(input);
     }
 
-    @Test
-    public void parseNegativeNumberWithExponent()
+    @DataProvider
+    public static Object[][] malformedNumbers()
     {
-        ExposedJson json = WhisperJson.parse("-2e-2");
-        assertTrue(json.isNumber());
-        assertEquals(-2e-2, json.asDouble(), 0);
-    }
-
-    @Test
-    public void parseNegativeLongNumber()
-    {
-        ExposedJson json = WhisperJson.parse("-234567898765432");
-        assertTrue(json.isNumber());
-        assertEquals(-234567898765432L, json.asLong());
-    }
-
-    @Test
-    public void parseNumberWithExponent()
-    {
-        ExposedJson json = WhisperJson.parse("33e12");
-        assertTrue(json.isNumber());
-        assertEquals(33e12, json.asDouble(), 0);
-    }
-
-    @Test
-    public void parseNumberWithExponentUppercase()
-    {
-        ExposedJson json = WhisperJson.parse("33E12");
-        assertTrue(json.isNumber());
-        assertEquals(33e12, json.asDouble(), 0);
-    }
-
-    @Test
-    public void parseNumberWithExponentPlus()
-    {
-        ExposedJson json = WhisperJson.parse("33E+12");
-        assertTrue(json.isNumber());
-        assertEquals(33e12, json.asDouble(), 0);
-    }
-
-    @Test
-    public void parseNumberWithExponentMinus()
-    {
-        ExposedJson json = WhisperJson.parse("33E-12");
-        assertTrue(json.isNumber());
-        assertEquals(33e-12, json.asDouble(), 0);
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseNumberWithEmptyExponent()
-    {
-        WhisperJson.parse("33E");
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseNumberWithEmptyExponentPlus()
-    {
-        WhisperJson.parse("33E+");
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseNumberWithBrokenExponent()
-    {
-        WhisperJson.parse("33E++2");
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseNumberWithMultipleExponents()
-    {
-        WhisperJson.parse("33E2E4");
-    }
-
-    @Test
-    public void parseFloat()
-    {
-        ExposedJson json = WhisperJson.parse("3.141");
-        assertTrue(json.isNumber());
-        assertEquals(3.141, json.asFloat(), 0.001);
-    }
-
-    @Test
-    public void parseNegativeFloat()
-    {
-        ExposedJson json = WhisperJson.parse("-3.141");
-        assertTrue(json.isNumber());
-        assertEquals(-3.141, json.asFloat(), 0.001);
-    }
-
-    @Test
-    public void parseFloatWithExponent()
-    {
-        ExposedJson json = WhisperJson.parse("-3.141e+4");
-        assertTrue(json.isNumber());
-        assertEquals(-3.141e4, json.asFloat(), 0.001);
-    }
-
-    @Test
-    public void parseFloatWithLeadingZero()
-    {
-        ExposedJson json = WhisperJson.parse("0.33333333");
-        assertTrue(json.isNumber());
-        assertEquals(0.33333333, json.asFloat(), 0.001);
-    }
-
-    @Test
-    public void parseFloatWithLeadingZeroAndExponent()
-    {
-        ExposedJson json = WhisperJson.parse("0.333e4");
-        assertTrue(json.isNumber());
-        assertEquals(0.333e4, json.asFloat(), 0.001);
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseFloatWithComma()
-    {
-        WhisperJson.parse("3,141");
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseFloatStartingWithDot()
-    {
-        WhisperJson.parse(".141");
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseNegativeFloatStartingWithDot()
-    {
-        WhisperJson.parse("-.141");
-    }
-
-    @Test(expected = ParseException.class)
-    public void parseFloatWithDoubleDot()
-    {
-        WhisperJson.parse("111..333");
+        return new Object[][]{
+            new Object[]{ "minus", "-" },
+            new Object[]{ "leading zero", "023" },
+            new Object[]{ "empty exponent", "33E" },
+            new Object[]{ "empty exponent plus", "33E+" },
+            new Object[]{ "broken exponent", "33E++2" },
+            new Object[]{ "multiple exponents", "33E2E4" },
+            new Object[]{ "float with comma", "3,141" },
+            new Object[]{ "float starting with dot", ".141" },
+            new Object[]{ "negative float starting with dot", "-.141" },
+            new Object[]{ "float with double dot", "111..333" }
+        };
     }
 }

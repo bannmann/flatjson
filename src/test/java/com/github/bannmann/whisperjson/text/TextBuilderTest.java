@@ -1,8 +1,8 @@
 package com.github.bannmann.whisperjson.text;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class TextBuilderTest
 {
@@ -12,9 +12,10 @@ public class TextBuilderTest
         TextBuilder builder = new TextBuilder(10);
         builder.append("foo");
         builder.append('b', 'a', 'r');
-        assertEquals("foobar",
-            builder.build()
-                .asString());
+        String result = builder.build()
+            .asString();
+
+        assertThat(result).isEqualTo("foobar");
     }
 
     @Test
@@ -22,9 +23,10 @@ public class TextBuilderTest
     {
         TextBuilder builder = new TextBuilder(2);
         builder.append("capacity increased");
-        assertEquals("capacity increased",
-            builder.build()
-                .asString());
+        String result = builder.build()
+            .asString();
+
+        assertThat(result).isEqualTo("capacity increased");
     }
 
     @Test
@@ -32,6 +34,9 @@ public class TextBuilderTest
     {
         TextBuilder builder = new TextBuilder(10);
         builder.append("baz");
-        assertEquals(builder.build(), builder.build());
+        Text first = builder.build();
+        Text second = builder.build();
+
+        assertThat(first).isEqualTo(second);
     }
 }

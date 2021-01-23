@@ -1,62 +1,48 @@
 package com.github.bannmann.whisperjson;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import com.github.bannmann.whisperjson.text.StringText;
 
 public class EscapeTest
 {
-    @Test
-    public void escapeEmptyString()
+    @Test(dataProvider = "noEscapingNeeded")
+    public void doNotEscape(String label, String input)
     {
-        assertEquals("", invokeEscape(""));
+        String escaped = invokeEscape(input);
+        assertThat(escaped).isEqualTo(input);
     }
 
-    @Test
-    public void escapeText()
+    @DataProvider
+    public static Object[][] noEscapingNeeded()
     {
-        String text = "th3 quick brown fox jumps ov3r th3 l4zy dog";
-        assertEquals(text, invokeEscape(text));
+        return new Object[][]{
+            new Object[]{ "empty", "" },
+            new Object[]{ "text", "th3 quick brown fox jumps ov3r th3 l4zy dog" },
+            new Object[]{ "slash", "brown / fox" }
+        };
     }
 
-    @Test
-    public void escapeQuote()
+    @Test(dataProvider = "escapeVariants")
+    public void testEscape(String label, String input, String expected)
     {
-        assertEquals("brown \\\" fox", invokeEscape("brown \" fox"));
+        String escaped = invokeEscape(input);
+        assertThat(escaped).isEqualTo(expected);
     }
 
-    @Test
-    public void escapeBackslash()
+    @DataProvider
+    public static Object[][] escapeVariants()
     {
-        assertEquals("brown \\\\ fox", invokeEscape("brown \\ fox"));
-    }
-
-    @Test
-    public void escapeSlash()
-    {
-        assertEquals("brown / fox", invokeEscape("brown / fox"));
-    }
-
-    @Test
-    public void escapeFoo()
-    {
-        String expected = "\\b";
-        String actual = invokeEscape("\b");
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void escapeControlChars()
-    {
-        assertEquals("\\b\\f\\n\\r\\t", invokeEscape("\b\f\n\r\t"));
-    }
-
-    @Test
-    public void escapeUnicode()
-    {
-        assertEquals("\\u2ebf", invokeEscape("\u2ebf"));
+        return new Object[][]{
+            new Object[]{ "quote", "brown \" fox", "brown \\\" fox" },
+            new Object[]{ "backslash", "brown \\ fox", "brown \\\\ fox" },
+            new Object[]{ "backspace", "\b", "\\b" },
+            new Object[]{ "control chars", "\b\f\n\r\t", "\\b\\f\\n\\r\\t" },
+            new Object[]{ "unicode", "\u2ebf", "\\u2ebf" },
+            };
     }
 
     private String invokeEscape(String s)
