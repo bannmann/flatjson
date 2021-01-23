@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-public class Json
+public interface Json<J extends Json<?>>
 {
     enum Type
     {
@@ -19,123 +19,82 @@ public class Json
         OBJECT
     }
 
-    protected static Json create(Overlay overlay, int element)
-    {
-        Type type = overlay.getType(element);
-        switch (type)
-        {
-            case NULL:
-                return Literal.Null.INSTANCE;
-            case TRUE:
-                return Literal.Bool.TRUE;
-            case FALSE:
-                return Literal.Bool.FALSE;
-            case NUMBER:
-                return new Literal.Number(overlay.getJson(element)
-                    .asString());
-            case STRING_ESCAPED:
-            case STRING:
-                return new Parsed.Strng(overlay, element);
-            case ARRAY:
-                return new Parsed.Array(overlay, element);
-            case OBJECT:
-                return new Parsed.Object(overlay, element);
-            default:
-                throw new ParseException("unknown type: " + type);
-        }
-    }
-
-    public static Json parse(String raw)
-    {
-        return create(new Overlay(raw), 0);
-    }
-
-    public static Json parse(char[] raw)
-    {
-        return create(new Overlay(raw), 0);
-    }
-
-    public boolean isNull()
+    default boolean isNull()
     {
         return false;
     }
 
-    public boolean isBoolean()
+    default boolean isBoolean()
     {
         return false;
     }
 
-    public boolean isNumber()
+    default boolean isNumber()
     {
         return false;
     }
 
-    public boolean isString()
+    default boolean isString()
     {
         return false;
     }
 
-    public boolean isArray()
+    default boolean isArray()
     {
         return false;
     }
 
-    public boolean isObject()
+    default boolean isObject()
     {
         return false;
     }
 
-    public boolean asBoolean()
+    default boolean asBoolean()
     {
         throw new IllegalStateException("not a boolean");
     }
 
-    public int asInt()
+    default int asInt()
     {
         throw new IllegalStateException("not a number");
     }
 
-    public long asLong()
+    default long asLong()
     {
         throw new IllegalStateException("not a number");
     }
 
-    public float asFloat()
+    default float asFloat()
     {
         throw new IllegalStateException("not a number");
     }
 
-    public double asDouble()
+    default double asDouble()
     {
         throw new IllegalStateException("not a number");
     }
 
-    public BigInteger asBigInteger()
+    default BigInteger asBigInteger()
     {
         throw new IllegalStateException("not a number");
     }
 
-    public BigDecimal asBigDecimal()
+    default BigDecimal asBigDecimal()
     {
         throw new IllegalStateException("not a number");
     }
 
-    public String asString()
+    default char[] asCharArray()
     {
         throw new IllegalStateException("not a string");
     }
 
-    public char[] asCharArray()
-    {
-        throw new IllegalStateException("not a string");
-    }
-
-    public List<Json> asArray()
+    default List<J> asArray()
     {
         throw new IllegalStateException("not an array");
     }
 
-    public Map<String, Json> asObject()
+    default Map<String, J> asObject()
     {
         throw new IllegalStateException("not an object");
     }

@@ -15,45 +15,45 @@ public class JsonTest
     @Test(expected = ParseException.class)
     public void parseNull()
     {
-        Json.parse((String) null);
+        WhisperJson.parse((String) null);
     }
 
     @Test(expected = ParseException.class)
     public void parseEmpty()
     {
-        Json.parse("");
+        WhisperJson.parse("");
     }
 
     @Test(expected = ParseException.class)
     public void parseWhitespace()
     {
-        Json.parse("  \r\n  \t ");
+        WhisperJson.parse("  \r\n  \t ");
     }
 
     @Test
     public void parseJsonNull()
     {
-        assertTrue(Json.parse("null")
+        assertTrue(WhisperJson.parse("null")
             .isNull());
     }
 
     @Test
     public void parseNullWithWhitespace()
     {
-        assertTrue(Json.parse("   \r\n null \t")
+        assertTrue(WhisperJson.parse("   \r\n null \t")
             .isNull());
     }
 
     @Test(expected = ParseException.class)
     public void parseBrokenNull()
     {
-        Json.parse("nul");
+        WhisperJson.parse("nul");
     }
 
     @Test
     public void parseTrue()
     {
-        Json json = Json.parse("true");
+        ExposedJson json = WhisperJson.parse("true");
         assertTrue(json.isBoolean());
         assertTrue(json.asBoolean());
     }
@@ -61,7 +61,7 @@ public class JsonTest
     @Test
     public void parseFalse()
     {
-        Json json = Json.parse("false");
+        ExposedJson json = WhisperJson.parse("false");
         assertTrue(json.isBoolean());
         assertFalse(json.asBoolean());
     }
@@ -69,7 +69,7 @@ public class JsonTest
     @Test
     public void parseEmptyArray()
     {
-        Json json = Json.parse("[ ]");
+        ExposedJson json = WhisperJson.parse("[ ]");
         assertTrue(json.isArray());
         assertEquals(0,
             json.asArray()
@@ -79,27 +79,27 @@ public class JsonTest
     @Test(expected = ParseException.class)
     public void parseArrayWithLeadingComma()
     {
-        Json.parse("[ , true]");
+        WhisperJson.parse("[ , true]");
     }
 
     @Test(expected = ParseException.class)
     public void parseArrayWithTrailingComma()
     {
-        Json.parse("[ true,]");
+        WhisperJson.parse("[ true,]");
     }
 
     @Test(expected = ParseException.class)
     public void parseOpenArray()
     {
-        Json.parse("[ null,");
+        WhisperJson.parse("[ null,");
     }
 
     @Test
     public void parseBooleanArray()
     {
-        Json json = Json.parse("[ true,false ]");
+        ExposedJson json = WhisperJson.parse("[ true,false ]");
         assertTrue(json.isArray());
-        List<Json> array = json.asArray();
+        List<ExposedJson> array = json.asArray();
         assertEquals(2, array.size());
         assertTrue(array.get(0)
             .asBoolean());
@@ -110,9 +110,9 @@ public class JsonTest
     @Test
     public void parseNumberArray()
     {
-        Json json = Json.parse("[23,42e8,3.141]");
+        ExposedJson json = WhisperJson.parse("[23,42e8,3.141]");
         assertTrue(json.isArray());
-        List<Json> array = json.asArray();
+        List<ExposedJson> array = json.asArray();
         assertEquals(3, array.size());
         assertEquals(23,
             array.get(0)
@@ -130,16 +130,15 @@ public class JsonTest
     @Test
     public void parseMixedArray()
     {
-        Json json = Json.parse("[42, true, \"hello\"]");
+        ExposedJson json = WhisperJson.parse("[42, true, \"hello\"]");
         assertTrue(json.isArray());
-        List<Json> array = json.asArray();
+        List<ExposedJson> array = json.asArray();
         assertEquals(3, array.size());
         assertEquals(42,
             array.get(0)
                 .asLong());
-        assertEquals(true,
-            array.get(1)
-                .asBoolean());
+        assertTrue(array.get(1)
+            .asBoolean());
         assertEquals("hello",
             array.get(2)
                 .asString());
@@ -148,13 +147,13 @@ public class JsonTest
     @Test
     public void parseNestedArray()
     {
-        Json json = Json.parse("[[[],[]]]");
+        ExposedJson json = WhisperJson.parse("[[[],[]]]");
         assertTrue(json.isArray());
-        List<Json> array = json.asArray();
+        List<ExposedJson> array = json.asArray();
         assertEquals(1, array.size());
-        Json nested = array.get(0);
+        ExposedJson nested = array.get(0);
         assertTrue(nested.isArray());
-        List<Json> nestedArray = nested.asArray();
+        List<ExposedJson> nestedArray = nested.asArray();
         assertEquals(2, nestedArray.size());
         assertTrue(nestedArray.get(0)
             .isArray());
@@ -165,18 +164,18 @@ public class JsonTest
     @Test
     public void parseEmptyObject()
     {
-        Json json = Json.parse("{}");
+        ExposedJson json = WhisperJson.parse("{}");
         assertTrue(json.isObject());
-        Map<String, Json> object = json.asObject();
+        Map<String, ExposedJson> object = json.asObject();
         assertEquals(0, object.size());
     }
 
     @Test
     public void parseObject()
     {
-        Json json = Json.parse("{\"foo\": true ,\n   \"bar\": false   }");
+        ExposedJson json = WhisperJson.parse("{\"foo\": true ,\n   \"bar\": false   }");
         assertTrue(json.isObject());
-        Map<String, Json> object = json.asObject();
+        Map<String, ExposedJson> object = json.asObject();
         assertEquals(2, object.size());
         assertTrue(object.containsKey("foo"));
         assertTrue(object.get("foo")
@@ -189,9 +188,9 @@ public class JsonTest
     @Test
     public void parseObjectWithEscapedKey()
     {
-        Json json = Json.parse("{\"\\noo\\b\": true }");
+        ExposedJson json = WhisperJson.parse("{\"\\noo\\b\": true }");
         assertTrue(json.isObject());
-        Map<String, Json> object = json.asObject();
+        Map<String, ExposedJson> object = json.asObject();
         assertEquals(1, object.size());
         assertTrue(object.containsKey("\noo\b"));
     }
@@ -199,13 +198,13 @@ public class JsonTest
     @Test
     public void parseNestedObject()
     {
-        Json json = Json.parse("{\"nested\": {\"foo\": 23 }, \"bar\": false , \"baz\": -1 }");
+        ExposedJson json = WhisperJson.parse("{\"nested\": {\"foo\": 23 }, \"bar\": false , \"baz\": -1 }");
         assertTrue(json.isObject());
-        Map<String, Json> object = json.asObject();
+        Map<String, ExposedJson> object = json.asObject();
         assertEquals(3, object.size());
-        Json nested = object.get("nested");
+        ExposedJson nested = object.get("nested");
         assertTrue(nested.isObject());
-        Map<String, Json> nestedObject = nested.asObject();
+        Map<String, ExposedJson> nestedObject = nested.asObject();
         assertEquals(23,
             nestedObject.get("foo")
                 .asLong());
@@ -214,11 +213,11 @@ public class JsonTest
     @Test
     public void parseArrayOfObjects()
     {
-        Json json = Json.parse("[{\"foo\": 23, \"bar\": 44}, {\"foo\": 11, \"bar\": 64}]");
+        ExposedJson json = WhisperJson.parse("[{\"foo\": 23, \"bar\": 44}, {\"foo\": 11, \"bar\": 64}]");
         assertTrue(json.isArray());
-        List<Json> array = json.asArray();
+        List<ExposedJson> array = json.asArray();
         assertEquals(2, array.size());
-        for (Json value : array)
+        for (ExposedJson value : array)
         {
             assertTrue(value.isObject());
             Set<String> keys = value.asObject()
