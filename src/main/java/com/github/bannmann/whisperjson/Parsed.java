@@ -1,16 +1,19 @@
 package com.github.bannmann.whisperjson;
 
 import java.util.Arrays;
+import java.util.Optional;
 
+import com.github.bannmann.whisperjson.text.CharArrayText;
+import com.github.bannmann.whisperjson.text.StringText;
 import com.github.bannmann.whisperjson.text.Text;
 
-abstract class Parsed<J extends Json<?>> implements Json<J>
+abstract class Parsed<J extends Json<?>, O extends Overlay<?>> implements Json<J>
 {
-    private static class Strng<J extends Json<?>> extends Parsed<J>
+    private static class Strng<J extends Json<?>, O extends Overlay<T>, T extends Text<T>> extends Parsed<J, O>
     {
-        private Text text;
+        private T text;
 
-        Strng(Overlay overlay, int element)
+        Strng(O overlay, int element)
         {
             super(overlay, element);
         }
@@ -21,28 +24,33 @@ abstract class Parsed<J extends Json<?>> implements Json<J>
             return true;
         }
 
-        protected Text getText()
+        protected final T getOrCreateText()
         {
             if (text == null)
             {
-                text = overlay.getUnescapedString(element);
+                text = overlay.getUnescapedText(element);
             }
             return text;
+        }
+
+        protected final Optional<T> getText()
+        {
+            return Optional.ofNullable(text);
         }
 
         @Override
         public char[] asCharArray()
         {
-            return getText().asCharArray();
+            return getOrCreateText().asCharArray();
         }
 
         @Override
         public boolean equals(java.lang.Object o)
         {
-            if (o instanceof Json)
+            if (o instanceof Strng)
             {
-                Json<?> other = (Json<?>) o;
-                return other.isString() && Arrays.equals(other.asCharArray(), asCharArray());
+                Strng<?, ?, ?> other = (Strng<?, ?, ?>) o;
+                return getOrCreateText().equals(other.getOrCreateText());
             }
             return false;
         }
@@ -54,9 +62,9 @@ abstract class Parsed<J extends Json<?>> implements Json<J>
         }
     }
 
-    static class ExposedStrng extends Strng<ExposedJson> implements ExposedJson
+    static class ExposedStrng extends Strng<ExposedJson, Overlay.Exposed, StringText> implements ExposedJson
     {
-        public ExposedStrng(Overlay overlay, int element)
+        public ExposedStrng(Overlay.Exposed overlay, int element)
         {
             super(overlay, element);
         }
@@ -64,22 +72,33 @@ abstract class Parsed<J extends Json<?>> implements Json<J>
         @Override
         public String asString()
         {
-            return getText().asString();
+            return getOrCreateText().asString();
         }
     }
 
-    static class SafeStrng extends Strng<SafeJson> implements SafeJson
+    static class SafeStrng extends Strng<SafeJson, Overlay.Safe, CharArrayText> implements SafeJson
     {
-        public SafeStrng(Overlay overlay, int element)
+        public SafeStrng(Overlay.Safe overlay, int element)
         {
             super(overlay, element);
         }
+
+        @Override
+        public void close()
+        {
+            if (element == 0)
+            {
+                overlay.close();
+            }
+
+            getText().ifPresent(CharArrayText::close);
+        }
     }
 
-    protected final Overlay overlay;
+    protected final O overlay;
     protected final int element;
 
-    Parsed(Overlay overlay, int element)
+    Parsed(O overlay, int element)
     {
         this.overlay = overlay;
         this.element = element;

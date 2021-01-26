@@ -47,7 +47,7 @@ public class EscapeTest
 
     private String invokeEscape(String s)
     {
-        return StringCodec.escape(new StringText(s))
+        return new StringText(s).escape()
             .asString();
     }
 }

@@ -1,6 +1,6 @@
 package com.github.bannmann.whisperjson;
 
-public interface Quux<J extends Json<?>>
+public interface Quux<J extends Json<?>, O extends Overlay<?>>
 {
-    J create(Overlay overlay, int element);
+    J create(O overlay, int element);
 }

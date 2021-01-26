@@ -1,10 +1,11 @@
 package com.github.bannmann.whisperjson.text;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import com.github.bannmann.whisperjson.ParseException;
 
-public class CharArrayText extends Text
+public class CharArrayText extends Text<CharArrayText> implements AutoCloseable
 {
     private static class CharacterIterator implements Iterator<Character>
     {
@@ -53,7 +54,7 @@ public class CharArrayText extends Text
     }
 
     @Override
-    public Text getPart(int beginIndex, int endIndex)
+    public CharArrayText getPart(int beginIndex, int endIndex)
     {
         int length = endIndex - beginIndex;
         char[] result = new char[length];
@@ -65,7 +66,7 @@ public class CharArrayText extends Text
     @Override
     public char[] asCharArray()
     {
-        return contents;
+        return Arrays.copyOf(contents, contents.length);
     }
 
     @Override
@@ -78,5 +79,23 @@ public class CharArrayText extends Text
     public Iterator<Character> getCharacters()
     {
         return new CharacterIterator(contents);
+    }
+
+    @Override
+    protected CharArrayText newInstance(char[] chars)
+    {
+        return new CharArrayText(chars);
+    }
+
+    @Override
+    protected CharArrayText self()
+    {
+        return this;
+    }
+
+    @Override
+    public void close()
+    {
+        Arrays.fill(contents, (char) 0);
     }
 }

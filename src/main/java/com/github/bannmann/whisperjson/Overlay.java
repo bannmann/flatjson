@@ -1,14 +1,42 @@
 package com.github.bannmann.whisperjson;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.github.bannmann.whisperjson.text.CharArrayText;
 import com.github.bannmann.whisperjson.text.StringText;
 import com.github.bannmann.whisperjson.text.Text;
 
-class Overlay
+class Overlay<T extends Text<T>>
 {
+    public static class Safe extends Overlay<CharArrayText> implements AutoCloseable
+    {
+        Safe(char[] raw)
+        {
+            super(new CharArrayText(raw));
+        }
+
+        @Override
+        public void close()
+        {
+            text.close();
+
+            for (int[] block : blocks)
+            {
+                Arrays.fill(block, 0);
+            }
+        }
+    }
+
+    public static class Exposed extends Overlay<StringText>
+    {
+        Exposed(String raw)
+        {
+            super(new StringText(raw));
+        }
+    }
+
     static int calculateBlockSize(int rawChars)
     {
         // make block size (in bytes) roughly equal to input size
@@ -21,22 +49,12 @@ class Overlay
     private static final int TO = 2;
     private static final int NESTED = 3;
 
-    private final Text text;
-    private final List<int[]> blocks;
-    private final int blockSize;
-    private int element;
+    protected final T text;
+    protected final List<int[]> blocks;
+    protected final int blockSize;
+    protected int element;
 
-    Overlay(String raw)
-    {
-        this(new StringText(raw));
-    }
-
-    Overlay(char[] raw)
-    {
-        this(new CharArrayText(raw));
-    }
-
-    private Overlay(Text text)
+    protected Overlay(T text)
     {
         if (text == null)
         {
@@ -59,15 +77,15 @@ class Overlay
         return getComponent(element, NESTED);
     }
 
-    Text getJson(int element)
+    T getJson(int element)
     {
         return text.getPart(getComponent(element, FROM), getComponent(element, TO) + 1);
     }
 
-    Text getUnescapedString(int element)
+    T getUnescapedText(int element)
     {
-        Text value = text.getPart(getComponent(element, FROM) + 1, getComponent(element, TO));
-        return (getType(element) == Json.Type.STRING_ESCAPED) ? StringCodec.unescape(value) : value;
+        T value = text.getPart(getComponent(element, FROM) + 1, getComponent(element, TO));
+        return (getType(element) == Json.Type.STRING_ESCAPED) ? value.unescape() : value;
     }
 
     private void parse()

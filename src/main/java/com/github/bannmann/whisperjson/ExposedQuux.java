@@ -1,9 +1,9 @@
 package com.github.bannmann.whisperjson;
 
-public class ExposedQuux implements Quux<ExposedJson>
+public class ExposedQuux implements Quux<ExposedJson, Overlay.Exposed>
 {
     @Override
-    public ExposedJson create(Overlay overlay, int element)
+    public ExposedJson create(Overlay.Exposed overlay, int element)
     {
         Json.Type type = overlay.getType(element);
         switch (type)

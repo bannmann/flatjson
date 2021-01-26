@@ -1,9 +1,9 @@
 package com.github.bannmann.whisperjson;
 
-public class SafeQuux implements Quux<SafeJson>
+public class SafeQuux implements Quux<SafeJson, Overlay.Safe>
 {
     @Override
-    public SafeJson create(Overlay overlay, int element)
+    public SafeJson create(Overlay.Safe overlay, int element)
     {
         Json.Type type = overlay.getType(element);
         switch (type)

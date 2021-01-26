@@ -12,8 +12,7 @@ public class TextBuilderTest
         TextBuilder builder = new TextBuilder(10);
         builder.append("foo");
         builder.append('b', 'a', 'r');
-        String result = builder.build()
-            .asString();
+        String result = getString(builder);
 
         assertThat(result).isEqualTo("foobar");
     }
@@ -23,8 +22,7 @@ public class TextBuilderTest
     {
         TextBuilder builder = new TextBuilder(2);
         builder.append("capacity increased");
-        String result = builder.build()
-            .asString();
+        String result = getString(builder);
 
         assertThat(result).isEqualTo("capacity increased");
     }
@@ -34,9 +32,15 @@ public class TextBuilderTest
     {
         TextBuilder builder = new TextBuilder(10);
         builder.append("baz");
-        Text first = builder.build();
-        Text second = builder.build();
+        String first = getString(builder);
+        String second = getString(builder);
 
         assertThat(first).isEqualTo(second);
+    }
+
+    private String getString(TextBuilder builder)
+    {
+        return builder.build(StringText::new)
+            .asString();
     }
 }

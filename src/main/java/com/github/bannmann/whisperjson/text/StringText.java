@@ -1,10 +1,11 @@
 package com.github.bannmann.whisperjson.text;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import com.github.bannmann.whisperjson.ParseException;
 
-public class StringText extends Text
+public class StringText extends Text<StringText>
 {
     private static class CharacterIterator implements Iterator<Character>
     {
@@ -25,7 +26,14 @@ public class StringText extends Text
         @Override
         public Character next()
         {
-            return string.charAt(position++);
+            try
+            {
+                return string.charAt(position++);
+            }
+            catch (IndexOutOfBoundsException e)
+            {
+                throw new NoSuchElementException(e.getMessage());
+            }
         }
     }
 
@@ -38,6 +46,15 @@ public class StringText extends Text
             throw new ParseException("cannot parse null");
         }
         this.contents = contents;
+    }
+
+    public StringText(char[] contents)
+    {
+        if (contents == null)
+        {
+            throw new ParseException("cannot parse null");
+        }
+        this.contents = new String(contents);
     }
 
     @Override
@@ -53,7 +70,7 @@ public class StringText extends Text
     }
 
     @Override
-    public Text getPart(int beginIndex, int endIndex)
+    public StringText getPart(int beginIndex, int endIndex)
     {
         String substring = contents.substring(beginIndex, endIndex);
         return new StringText(substring);
@@ -75,5 +92,17 @@ public class StringText extends Text
     public Iterator<Character> getCharacters()
     {
         return new CharacterIterator(contents);
+    }
+
+    @Override
+    protected StringText newInstance(char[] chars)
+    {
+        return new StringText(new String(chars));
+    }
+
+    @Override
+    protected StringText self()
+    {
+        return this;
     }
 }

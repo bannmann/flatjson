@@ -46,7 +46,7 @@ public class UnescapeTest
 
     private String invokeUnescape(String s)
     {
-        return StringCodec.unescape(new StringText(s))
+        return new StringText(s).unescape()
             .asString();
     }
 }

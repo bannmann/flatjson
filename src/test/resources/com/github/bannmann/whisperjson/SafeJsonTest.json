@@ -1,0 +1,11 @@
+{
+    "username": "alice",
+    "password": "s56qvQUPvUvQ7",
+    "extraObject": {
+        "baz": 7,
+        "numbersArray": [
+            42,
+            1337
+        ]
+    }
+}

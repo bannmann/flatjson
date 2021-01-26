@@ -1,13 +1,10 @@
 package com.github.bannmann.whisperjson.text;
 
+import java.util.function.Function;
+
 public class TextBuilder implements AutoCloseable
 {
     private final StringBuilder contents;
-
-    public TextBuilder()
-    {
-        this(0);
-    }
 
     public TextBuilder(int initialCapacity)
     {
@@ -24,12 +21,9 @@ public class TextBuilder implements AutoCloseable
         contents.append(charSequence);
     }
 
-    public Text build()
+    public <T extends Text<T>> T build(Function<char[], T> constructor)
     {
-        int length = contents.length();
-        char[] result = new char[length];
-        contents.getChars(0, length, result, 0);
-        return new CharArrayText(result);
+        return constructor.apply(StringBuilders.copyToCharArray(contents));
     }
 
     @Override

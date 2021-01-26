@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-abstract class Structure<J extends Json<?>, Q extends Quux<J>> implements Json<J>
+abstract class Structure<J extends Json<?>, O extends Overlay<?>, Q extends Quux<J, O>> implements Json<J>
 {
-    static class Array<J extends Json<?>, Q extends Quux<J>> extends Structure<J, Q>
+    static class Array<J extends Json<?>, O extends Overlay<?>, Q extends Quux<J, O>> extends Structure<J, O, Q>
     {
         private List<J> list;
 
-        Array(Overlay overlay, int element, Q quux)
+        Array(O overlay, int element, Q quux)
         {
             super(overlay, element, quux);
         }
@@ -63,27 +63,36 @@ abstract class Structure<J extends Json<?>, Q extends Quux<J>> implements Json<J
         }
     }
 
-    static class ExposedArray extends Array<ExposedJson, ExposedQuux> implements ExposedJson
+    static class ExposedArray extends Array<ExposedJson, Overlay.Exposed, ExposedQuux> implements ExposedJson
     {
-        ExposedArray(Overlay overlay, int element, ExposedQuux quux)
+        ExposedArray(Overlay.Exposed overlay, int element, ExposedQuux quux)
         {
             super(overlay, element, quux);
         }
     }
 
-    static class SafeArray extends Array<SafeJson, SafeQuux> implements SafeJson
+    static class SafeArray extends Array<SafeJson, Overlay.Safe, SafeQuux> implements SafeJson
     {
-        SafeArray(Overlay overlay, int element, SafeQuux quux)
+        SafeArray(Overlay.Safe overlay, int element, SafeQuux quux)
         {
             super(overlay, element, quux);
         }
+
+        @Override
+        public void close()
+        {
+            if (element == 0)
+            {
+                overlay.close();
+            }
+        }
     }
 
-    static class Object<J extends Json<?>, Q extends Quux<J>> extends Structure<J, Q>
+    static class Object<J extends Json<?>, O extends Overlay<?>, Q extends Quux<J, O>> extends Structure<J, O, Q>
     {
         private Map<String, J> map;
 
-        Object(Overlay overlay, int element, Q quux)
+        Object(O overlay, int element, Q quux)
         {
             super(overlay, element, quux);
         }
@@ -110,7 +119,7 @@ abstract class Structure<J extends Json<?>, Q extends Quux<J>> implements Json<J
             int e = element + 1;
             while (e <= element + overlay.getNested(element))
             {
-                String key = overlay.getUnescapedString(e)
+                String key = overlay.getUnescapedText(e)
                     .asString();
                 result.put(key, quux.create(overlay, e + 1));
                 e += overlay.getNested(e + 1) + 2;
@@ -136,27 +145,36 @@ abstract class Structure<J extends Json<?>, Q extends Quux<J>> implements Json<J
         }
     }
 
-    static class ExposedObject extends Object<ExposedJson, ExposedQuux> implements ExposedJson
+    static class ExposedObject extends Object<ExposedJson, Overlay.Exposed, ExposedQuux> implements ExposedJson
     {
-        ExposedObject(Overlay overlay, int element, ExposedQuux quux)
+        ExposedObject(Overlay.Exposed overlay, int element, ExposedQuux quux)
         {
             super(overlay, element, quux);
         }
     }
 
-    static class SafeObject extends Object<SafeJson, SafeQuux> implements SafeJson
+    static class SafeObject extends Object<SafeJson, Overlay.Safe, SafeQuux> implements SafeJson
     {
-        SafeObject(Overlay overlay, int element, SafeQuux quux)
+        SafeObject(Overlay.Safe overlay, int element, SafeQuux quux)
         {
             super(overlay, element, quux);
         }
+
+        @Override
+        public void close()
+        {
+            if (element == 0)
+            {
+                overlay.close();
+            }
+        }
     }
 
-    protected final Overlay overlay;
+    protected final O overlay;
     protected final int element;
     protected final Q quux;
 
-    Structure(Overlay overlay, int element, Q quux)
+    Structure(O overlay, int element, Q quux)
     {
         this.overlay = overlay;
         this.element = element;

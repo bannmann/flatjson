@@ -84,6 +84,9 @@ public interface Json<J extends Json<?>>
         throw new IllegalStateException("not a number");
     }
 
+    /**
+     * @return a new array with a copy of the contents of this JSON string
+     */
     default char[] asCharArray()
     {
         throw new IllegalStateException("not a string");
