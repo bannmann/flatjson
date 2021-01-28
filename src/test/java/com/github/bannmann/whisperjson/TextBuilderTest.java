@@ -1,4 +1,4 @@
-package com.github.bannmann.whisperjson.text;
+package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +40,7 @@ public class TextBuilderTest
 
     private String getString(TextBuilder builder)
     {
-        return builder.build(StringText::new)
+        return builder.build(Text.Safe::new)
             .asString();
     }
 }

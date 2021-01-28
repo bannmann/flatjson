@@ -5,20 +5,8 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-public interface Json<J extends Json<?>>
+public interface Json<J extends Json<J>>
 {
-    enum Type
-    {
-        NULL,
-        TRUE,
-        FALSE,
-        NUMBER,
-        STRING,
-        STRING_ESCAPED,
-        ARRAY,
-        OBJECT
-    }
-
     default boolean isNull()
     {
         return false;

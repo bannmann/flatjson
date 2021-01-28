@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.github.bannmann.whisperjson.text.StringBuilders;
 import com.google.common.io.CharStreams;
 
 public class SafeJsonTest

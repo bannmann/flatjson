@@ -1,8 +1,8 @@
-package com.github.bannmann.whisperjson.text;
+package com.github.bannmann.whisperjson;
 
 import java.util.function.Function;
 
-public class TextBuilder implements AutoCloseable
+class TextBuilder implements AutoCloseable
 {
     private final StringBuilder contents;
 

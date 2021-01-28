@@ -16,7 +16,7 @@ public class WhisperJson
      */
     public static ExposedJson parse(String raw)
     {
-        return new ExposedQuux().create(new Overlay.Exposed(raw), 0);
+        return new Factory.Exposed().create(new Overlay.Exposed(raw), 0);
     }
 
     /**
@@ -31,6 +31,6 @@ public class WhisperJson
      */
     public static SafeJson parse(char[] raw)
     {
-        return new SafeQuux().create(new Overlay.Safe(raw), 0);
+        return new Factory.Safe().create(new Overlay.Safe(raw), 0);
     }
 }

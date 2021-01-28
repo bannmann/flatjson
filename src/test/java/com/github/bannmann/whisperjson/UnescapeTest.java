@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.github.bannmann.whisperjson.text.StringText;
-
 public class UnescapeTest
 {
     @Test(dataProvider = "noUnescapingNeeded")
@@ -46,7 +44,7 @@ public class UnescapeTest
 
     private String invokeUnescape(String s)
     {
-        return new StringText(s).unescape()
+        return new Text.Exposed(s).unescape()
             .asString();
     }
 }

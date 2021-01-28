@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.github.bannmann.whisperjson.text.StringText;
-
 public class EscapeTest
 {
     @Test(dataProvider = "noEscapingNeeded")
@@ -47,7 +45,7 @@ public class EscapeTest
 
     private String invokeEscape(String s)
     {
-        return new StringText(s).escape()
+        return new Text.Exposed(s).escape()
             .asString();
     }
 }

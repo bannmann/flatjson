@@ -1,4 +1,4 @@
-package com.github.bannmann.whisperjson.text;
+package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,9 +15,9 @@ public class EqualityTest
 
     private void assertEquality(String value)
     {
-        Text charArrayText = new CharArrayText(value.toCharArray());
-        Text stringText = new StringText(value);
+        Text<?> safeText = new Text.Safe(value.toCharArray());
+        Text<?> exposedText = new Text.Exposed(value);
 
-        assertThat(charArrayText).isEqualTo(stringText);
+        assertThat(safeText).isEqualTo(exposedText);
     }
 }

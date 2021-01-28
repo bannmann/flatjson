@@ -1,9 +1,9 @@
-package com.github.bannmann.whisperjson.text;
+package com.github.bannmann.whisperjson;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class StringBuilders
+class StringBuilders
 {
     public char[] copyToCharArray(StringBuilder builder)
     {

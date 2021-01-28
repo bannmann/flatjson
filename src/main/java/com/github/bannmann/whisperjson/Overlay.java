@@ -4,17 +4,28 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.github.bannmann.whisperjson.text.CharArrayText;
-import com.github.bannmann.whisperjson.text.StringText;
-import com.github.bannmann.whisperjson.text.Text;
+import com.google.common.annotations.VisibleForTesting;
 
-class Overlay<T extends Text<T>>
+abstract class Overlay<T extends Text<T>>
 {
-    public static class Safe extends Overlay<CharArrayText> implements AutoCloseable
+    public static final class Exposed extends Overlay<Text.Exposed>
     {
-        Safe(char[] raw)
+        public Exposed(String raw)
         {
-            super(new CharArrayText(raw));
+            super(new Text.Exposed(raw));
+        }
+    }
+
+    public static final class Safe extends Overlay<Text.Safe> implements AutoCloseable
+    {
+        public Safe(char[] raw)
+        {
+            super(new Text.Safe(raw));
+        }
+
+        public Safe(Text.Safe text)
+        {
+            super(text);
         }
 
         @Override
@@ -29,14 +40,7 @@ class Overlay<T extends Text<T>>
         }
     }
 
-    public static class Exposed extends Overlay<StringText>
-    {
-        Exposed(String raw)
-        {
-            super(new StringText(raw));
-        }
-    }
-
+    @VisibleForTesting
     static int calculateBlockSize(int rawChars)
     {
         // make block size (in bytes) roughly equal to input size
@@ -67,25 +71,25 @@ class Overlay<T extends Text<T>>
         parse();
     }
 
-    Json.Type getType(int element)
+    public Type getType(int element)
     {
-        return Json.Type.values()[getComponent(element, TYPE)];
+        return Type.values()[getComponent(element, TYPE)];
     }
 
-    int getNested(int element)
+    public int getNested(int element)
     {
         return getComponent(element, NESTED);
     }
 
-    T getJson(int element)
+    public T getJson(int element)
     {
         return text.getPart(getComponent(element, FROM), getComponent(element, TO) + 1);
     }
 
-    T getUnescapedText(int element)
+    public T getUnescapedText(int element)
     {
         T value = text.getPart(getComponent(element, FROM) + 1, getComponent(element, TO));
-        return (getType(element) == Json.Type.STRING_ESCAPED) ? value.unescape() : value;
+        return (getType(element) == Type.STRING_ESCAPED) ? value.unescape() : value;
     }
 
     private void parse()
@@ -220,7 +224,7 @@ class Overlay<T extends Text<T>>
         {
             throw new ParseException("isolated minus");
         }
-        return createElement(Json.Type.NUMBER, from, i - 1, 0);
+        return createElement(Type.NUMBER, from, i - 1, 0);
     }
 
     private int parseString(int i)
@@ -232,7 +236,7 @@ class Overlay<T extends Text<T>>
             char c = text.charAt(i);
             if (c == '"')
             {
-                Json.Type type = escaped ? Json.Type.STRING_ESCAPED : Json.Type.STRING;
+                Type type = escaped ? Type.STRING_ESCAPED : Type.STRING;
                 return createElement(type, from, i, 0);
             }
             else if (c < 32)
@@ -268,7 +272,7 @@ class Overlay<T extends Text<T>>
     {
         int count = 0;
         int e = element;
-        createElement(Json.Type.ARRAY, i);
+        createElement(Type.ARRAY, i);
         i++;
         while (true)
         {
@@ -291,7 +295,7 @@ class Overlay<T extends Text<T>>
     {
         int count = 0;
         int e = element;
-        createElement(Json.Type.OBJECT, i);
+        createElement(Type.OBJECT, i);
         i++;
         while (true)
         {
@@ -320,7 +324,7 @@ class Overlay<T extends Text<T>>
         expectChar(i + 1, 'u');
         expectChar(i + 2, 'l');
         expectChar(i + 3, 'l');
-        return createElement(Json.Type.NULL, i, i + 3, 0);
+        return createElement(Type.NULL, i, i + 3, 0);
     }
 
     private int parseTrue(int i)
@@ -328,7 +332,7 @@ class Overlay<T extends Text<T>>
         expectChar(i + 1, 'r');
         expectChar(i + 2, 'u');
         expectChar(i + 3, 'e');
-        return createElement(Json.Type.TRUE, i, i + 3, 0);
+        return createElement(Type.TRUE, i, i + 3, 0);
     }
 
     private int parseFalse(int i)
@@ -337,7 +341,7 @@ class Overlay<T extends Text<T>>
         expectChar(i + 2, 'l');
         expectChar(i + 3, 's');
         expectChar(i + 4, 'e');
-        return createElement(Json.Type.FALSE, i, i + 4, 0);
+        return createElement(Type.FALSE, i, i + 4, 0);
     }
 
     private int skipWhitespace(int i)
@@ -377,12 +381,12 @@ class Overlay<T extends Text<T>>
         return getBlock(element)[getBlockIndex(element) + offset];
     }
 
-    private int createElement(Json.Type type, int from)
+    private int createElement(Type type, int from)
     {
         return createElement(type, from, -1, -1);
     }
 
-    private int createElement(Json.Type type, int from, int to, int nested)
+    private int createElement(Type type, int from, int to, int nested)
     {
         int currentBlock = (element * 4) / blockSize;
         if (currentBlock == blocks.size())
