@@ -46,10 +46,10 @@ abstract class Bool<J extends Json<J>> implements Json<J>
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Json<?>)
+        if (o instanceof Bool<?>)
         {
-            Json<?> other = (Json<?>) o;
-            return other.isBoolean() && other.asBoolean() == value;
+            Bool<?> other = (Bool<?>) o;
+            return other.value == value;
         }
         return false;
     }

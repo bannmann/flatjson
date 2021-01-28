@@ -1,6 +1,5 @@
 package com.github.bannmann.whisperjson;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>> implements Json<J>
@@ -88,6 +87,6 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
     @Override
     public int hashCode()
     {
-        return Arrays.hashCode(asCharArray());
+        return getOrCreateText().hashCode();
     }
 }

@@ -72,10 +72,10 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Json<?>)
+        if (o instanceof Objct<?, ?, ?>)
         {
-            Json<?> other = (Json<?>) o;
-            return other.isObject() && Objects.equals(other.asObject(), asObject());
+            Objct<?, ?, ?> other = (Objct<?, ?, ?>) o;
+            return Objects.equals(other.asObject(), asObject());
         }
         return false;
     }

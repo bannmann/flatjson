@@ -29,12 +29,7 @@ abstract class Null<J extends Json<J>> implements Json<J>
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Json<?>)
-        {
-            Json<?> other = (Json<?>) o;
-            return other.isNull();
-        }
-        return false;
+        return o instanceof Null<?>;
     }
 
     @Override

@@ -74,10 +74,10 @@ abstract class Number<J extends Json<J>> implements Json<J>
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Json<?>)
+        if (o instanceof Number<?>)
         {
-            Json<?> other = (Json<?>) o;
-            return other.isNumber() && Objects.equals(other.asBigDecimal(), asBigDecimal());
+            Number<?> other = (Number<?>) o;
+            return Objects.equals(other.asBigDecimal(), asBigDecimal());
         }
         return false;
     }
