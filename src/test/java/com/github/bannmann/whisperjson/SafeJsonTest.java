@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.fail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -23,15 +24,14 @@ public class SafeJsonTest
     @BeforeMethod
     public void setUp() throws IOException
     {
-        inputCharacters = readTestData();
+        inputCharacters = getTestDataArray();
 
         assertThat(inputCharacters.length > 0).isTrue();
     }
 
-    private char[] readTestData() throws IOException
+    private char[] getTestDataArray() throws IOException
     {
-        try (InputStream inputStream = getClass().getResourceAsStream(TEST_JSON);
-             InputStreamReader reader = new InputStreamReader(inputStream))
+        try (InputStreamReader reader = getTestDataReader())
         {
             StringBuilder stringBuilder = new StringBuilder();
             CharStreams.copy(reader, stringBuilder);
@@ -41,6 +41,16 @@ public class SafeJsonTest
 
             return chars;
         }
+    }
+
+    private InputStreamReader getTestDataReader()
+    {
+        return new InputStreamReader(getTestDataInputStream());
+    }
+
+    private InputStream getTestDataInputStream()
+    {
+        return getClass().getResourceAsStream(TEST_JSON);
     }
 
     @Test
@@ -54,6 +64,26 @@ public class SafeJsonTest
         {
             assertThat(username.asCharArray()).isEqualTo(EXPECTED_USERNAME);
             assertThat(password.asCharArray()).isEqualTo(EXPECTED_PASSWORD);
+        }
+    }
+
+    @Test
+    public void consumeReader() throws IOException
+    {
+        try (SafeJson fromArray = WhisperJson.parse(inputCharacters);
+             SafeJson fromReader = WhisperJson.parse(getTestDataReader()))
+        {
+            assertThat(fromReader).isEqualTo(fromArray);
+        }
+    }
+
+    @Test
+    public void consumeStream() throws IOException
+    {
+        try (SafeJson fromArray = WhisperJson.parse(inputCharacters);
+             SafeJson fromInputStream = WhisperJson.parse(getTestDataInputStream(), StandardCharsets.UTF_8))
+        {
+            assertThat(fromInputStream).isEqualTo(fromArray);
         }
     }
 
