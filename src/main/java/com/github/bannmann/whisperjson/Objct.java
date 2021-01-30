@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O>> extends Structure<J, O, F>
+abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Structure<J, O, F>
 {
     public static final class Exposed extends Objct<ExposedJson, Overlay.Exposed, Factory.Exposed>
         implements ExposedJson

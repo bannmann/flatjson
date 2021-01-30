@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O>> extends Structure<J, O, F>
+abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Structure<J, O, F>
 {
     public static final class Exposed extends Arry<ExposedJson, Overlay.Exposed, Factory.Exposed> implements ExposedJson
     {

@@ -1,69 +1,129 @@
 package com.github.bannmann.whisperjson;
 
-import com.github.mizool.core.exception.CodeInconsistencyException;
-
 @SuppressWarnings("java:S1610")
-abstract class Factory<J extends Json<J>, O extends Overlay<?>>
+abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>>
 {
-    public static final class Exposed extends Factory<ExposedJson, Overlay.Exposed>
+    public static final class Exposed extends Factory<ExposedJson, Overlay.Exposed, Exposed>
     {
         @Override
-        public ExposedJson create(Overlay.Exposed overlay, int element)
+        public ExposedJson createNull()
         {
-            Type type = overlay.getType(element);
-            switch (type)
-            {
-                case NULL:
-                    return Null.Exposed.INSTANCE;
-                case TRUE:
-                    return Bool.Exposed.TRUE;
-                case FALSE:
-                    return Bool.Exposed.FALSE;
-                case NUMBER:
-                    return new Number.Exposed(overlay.getJson(element)
-                        .asString());
-                case STRING_ESCAPED:
-                case STRING:
-                    return new Strng.Exposed(overlay, element);
-                case ARRAY:
-                    return new Arry.Exposed(overlay, element, this);
-                case OBJECT:
-                    return new Objct.Exposed(overlay, element, this);
-                default:
-                    throw new CodeInconsistencyException("unknown type: " + type);
-            }
+            return Null.Exposed.INSTANCE;
+        }
+
+        @Override
+        public ExposedJson createTrue()
+        {
+            return Bool.Exposed.TRUE;
+        }
+
+        @Override
+        public ExposedJson createFalse()
+        {
+            return Bool.Exposed.FALSE;
+        }
+
+        @Override
+        public ExposedJson createNumber(String asString)
+        {
+            return new Number.Exposed(asString);
+        }
+
+        @Override
+        public ExposedJson createString(Overlay.Exposed overlay, int element)
+        {
+            return new Strng.Exposed(overlay, element);
+        }
+
+        @Override
+        public ExposedJson createArray(Overlay.Exposed overlay, int element, Exposed factory)
+        {
+            return new Arry.Exposed(overlay, element, this);
+        }
+
+        @Override
+        public ExposedJson createObject(Overlay.Exposed overlay, int element, Exposed factory)
+        {
+            return new Objct.Exposed(overlay, element, this);
+        }
+
+        @Override
+        public Exposed getSelf()
+        {
+            return this;
         }
     }
 
-    public static final class Safe extends Factory<SafeJson, Overlay.Safe>
+    public static final class Safe extends Factory<SafeJson, Overlay.Safe, Safe>
     {
         @Override
-        public SafeJson create(Overlay.Safe overlay, int element)
+        public SafeJson createNull()
         {
-            Type type = overlay.getType(element);
-            switch (type)
-            {
-                case NULL:
-                    return Null.Safe.INSTANCE;
-                case TRUE:
-                    return Bool.Safe.TRUE;
-                case FALSE:
-                    return Bool.Safe.FALSE;
-                case NUMBER:
-                    return new Number.Safe(overlay.getJson(element)
-                        .asString());
-                case STRING_ESCAPED:
-                case STRING:
-                    return new Strng.Safe(overlay, element);
-                case ARRAY:
-                    return new Arry.Safe(overlay, element, this);
-                case OBJECT:
-                    return new Objct.Safe(overlay, element, this);
-                default:
-                    throw new CodeInconsistencyException("unknown type: " + type);
-            }
+            return Null.Safe.INSTANCE;
+        }
+
+        @Override
+        public SafeJson createTrue()
+        {
+            return Bool.Safe.TRUE;
+        }
+
+        @Override
+        public SafeJson createFalse()
+        {
+            return Bool.Safe.FALSE;
+        }
+
+        @Override
+        public SafeJson createNumber(String asString)
+        {
+            return new Number.Safe(asString);
+        }
+
+        @Override
+        public SafeJson createString(Overlay.Safe overlay, int element)
+        {
+            return new Strng.Safe(overlay, element);
+        }
+
+        @Override
+        public SafeJson createArray(Overlay.Safe overlay, int element, Safe factory)
+        {
+            return new Arry.Safe(overlay, element, this);
+        }
+
+        @Override
+        public SafeJson createObject(Overlay.Safe overlay, int element, Safe factory)
+        {
+            return new Objct.Safe(overlay, element, this);
+        }
+
+        @Override
+        public Safe getSelf()
+        {
+            return this;
         }
     }
 
-    public abstract J create(O overlay, int element);
+    public final J create(O overlay, int element)
+    {
+        return overlay.getType(element)
+            .create(overlay, element, getSelf());
+    }
+
+    public abstract J createNull();
+
+    public abstract J createTrue();
+
+    public abstract J createFalse();
+
+    public abstract J createNumber(String asString);
+
+    public abstract J createString(O overlay, int element);
+
+    public abstract J createArray(O overlay, int element, F factory);
+
+    public abstract J createObject(O overlay, int element, F factory);
+
+    public abstract F getSelf();
 }
