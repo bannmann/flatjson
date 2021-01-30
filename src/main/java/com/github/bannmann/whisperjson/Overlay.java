@@ -319,29 +319,32 @@ abstract class Overlay<T extends Text<T>>
         }
     }
 
-    private int parseNull(int i)
+    private int parseNull(int from)
     {
-        expectChar(i + 1, 'u');
-        expectChar(i + 2, 'l');
-        expectChar(i + 3, 'l');
-        return createElement(Type.NULL, i, i + 3, 0);
+        int to = from;
+        expectChar(++to, 'u');
+        expectChar(++to, 'l');
+        expectChar(++to, 'l');
+        return createElement(Type.NULL, from, to, 0);
     }
 
-    private int parseTrue(int i)
+    private int parseTrue(int from)
     {
-        expectChar(i + 1, 'r');
-        expectChar(i + 2, 'u');
-        expectChar(i + 3, 'e');
-        return createElement(Type.TRUE, i, i + 3, 0);
+        int to = from;
+        expectChar(++to, 'r');
+        expectChar(++to, 'u');
+        expectChar(++to, 'e');
+        return createElement(Type.TRUE, from, to, 0);
     }
 
-    private int parseFalse(int i)
+    private int parseFalse(int from)
     {
-        expectChar(i + 1, 'a');
-        expectChar(i + 2, 'l');
-        expectChar(i + 3, 's');
-        expectChar(i + 4, 'e');
-        return createElement(Type.FALSE, i, i + 4, 0);
+        int to = from;
+        expectChar(++to, 'a');
+        expectChar(++to, 'l');
+        expectChar(++to, 's');
+        expectChar(++to, 'e');
+        return createElement(Type.FALSE, from, to, 0);
     }
 
     private int skipWhitespace(int i)
