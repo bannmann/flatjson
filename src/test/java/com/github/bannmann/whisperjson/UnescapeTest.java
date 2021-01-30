@@ -1,6 +1,7 @@
 package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -40,6 +41,13 @@ public class UnescapeTest
             new Object[]{ "control chars", "\\b\\f\\n\\r\\t", "\b\f\n\r\t" },
             new Object[]{ "unicode", "\\u2ebf", "\u2ebf" }
         };
+    }
+
+    @Test
+    public void unescapeInvalid()
+    {
+        assertThatThrownBy(() -> invokeUnescape("\\z")).isInstanceOf(JsonSyntaxException.class)
+            .hasMessage("illegal escape char 'z' at index 1");
     }
 
     private String invokeUnescape(String s)

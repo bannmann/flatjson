@@ -317,11 +317,13 @@ abstract class Text<T extends Text<T>>
             int i = 0;
             while (i < length())
             {
-                if (charAt(i) == '\\')
+                char c = charAt(i);
+                if (c == '\\')
                 {
                     returnSelf = false;
                     i++;
-                    switch (charAt(i))
+                    char escapeChar = charAt(i);
+                    switch (escapeChar)
                     {
                         case '\\':
                             result.append('\\');
@@ -351,11 +353,13 @@ abstract class Text<T extends Text<T>>
                             result.append(Character.toChars(Integer.parseInt(getPart(i + 1, i + 5).asString(), 16)));
                             i += 4;
                             break;
+                        default:
+                            throw new JsonSyntaxException("illegal escape char", escapeChar, i);
                     }
                 }
                 else
                 {
-                    result.append(charAt(i));
+                    result.append(c);
                 }
                 i++;
             }

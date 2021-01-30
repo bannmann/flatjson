@@ -248,21 +248,27 @@ abstract class Overlay<T extends Text<T>>
             {
                 escaped = true;
                 c = text.charAt(i + 1);
-                if (c == '"' || c == '/' || c == '\\' || c == 'b' || c == 'f' || c == 'n' || c == 'r' || c == 't')
+                switch (c)
                 {
-                    i++;
-                }
-                else if (c == 'u')
-                {
-                    expectHex(i + 2);
-                    expectHex(i + 3);
-                    expectHex(i + 4);
-                    expectHex(i + 5);
-                    i += 5;
-                }
-                else
-                {
-                    throw new JsonSyntaxException("illegal escape char", c, i);
+                    case '"':
+                    case '/':
+                    case '\\':
+                    case 'b':
+                    case 'f':
+                    case 'n':
+                    case 'r':
+                    case 't':
+                        i++;
+                        break;
+                    case 'u':
+                        expectHex(i + 2);
+                        expectHex(i + 3);
+                        expectHex(i + 4);
+                        expectHex(i + 5);
+                        i += 5;
+                        break;
+                    default:
+                        throw new JsonSyntaxException("illegal escape char", c, i + 1);
                 }
             }
             i++;
