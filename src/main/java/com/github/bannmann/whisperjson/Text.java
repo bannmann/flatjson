@@ -194,6 +194,9 @@ abstract class Text<T extends Text<T>>
         }
     }
 
+    /**
+     * @throws IndexOutOfBoundsException if {@code index} is negative or not less than the length of this Text.
+     */
     public abstract char charAt(int index);
 
     public abstract int length();

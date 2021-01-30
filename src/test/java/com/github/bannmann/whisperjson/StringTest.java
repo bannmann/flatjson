@@ -33,7 +33,7 @@ public class StringTest
         };
     }
 
-    @Test(dataProvider = "malformedStrings", expectedExceptions = ParseException.class)
+    @Test(dataProvider = "malformedStrings", expectedExceptions = JsonSyntaxException.class)
     public void parseFailure(String label, String input)
     {
         WhisperJson.parse(input);

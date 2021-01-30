@@ -1,6 +1,7 @@
 package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 
 import java.util.List;
@@ -73,6 +74,36 @@ public class JsonTest
         assertThat(json.asArray()).satisfiesExactly(element -> assertThat(element.asLong()).isEqualTo(23),
             element -> assertThat(element.asDouble()).isCloseTo(42e8, within(0.0)),
             element -> assertThat(element.asDouble()).isCloseTo(3.141, within(0.0)));
+    }
+
+    @Test
+    public void parseString()
+    {
+        ExposedJson json = WhisperJson.parse("\"hello\"");
+
+        assertThat(json).returns(true, Json::isString);
+        assertThat(json.asString()).isEqualTo("hello");
+    }
+
+    @Test(dataProvider = "parsingErrors")
+    public void parseError(String label, String input, String message)
+    {
+        assertThatThrownBy(() -> WhisperJson.parse(input)).isInstanceOf(JsonSyntaxException.class)
+            .hasMessage(message);
+    }
+
+    @DataProvider
+    public static Object[][] parsingErrors()
+    {
+        return new Object[][]{
+            new Object[]{ "illegal escape", "\"example: \\z is invalid\"", "illegal escape char 'z' at index 11" },
+            new Object[]{ "incomplete null: EOF", "nul", "expected char 'l', found EOF at index 3" },
+            new Object[]{ "incomplete null: comma", "[nul, 42]", "expected char 'l', found ',' at index 4" },
+            new Object[]{ "typo null", "noll", "expected char 'u', found 'o' at index 1" },
+            new Object[]{ "array with leading comma", "[ , true]", "illegal char ',' at index 2" },
+            new Object[]{ "array with trailing comma", "[ true,]", "illegal char ']' at index 7" },
+            new Object[]{ "open array", "[ null,", "unbalanced json" }
+        };
     }
 
     @Test
@@ -168,7 +199,7 @@ public class JsonTest
             });
     }
 
-    @Test(dataProvider = "malformedJson", expectedExceptions = ParseException.class)
+    @Test(dataProvider = "malformedJson", expectedExceptions = JsonSyntaxException.class)
     public void parseFailure(String label, String input)
     {
         WhisperJson.parse(input);

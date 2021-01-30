@@ -18,7 +18,7 @@ public class WhisperJson
      *
      * @return an ExposedJson instance
      *
-     * @throws ParseException if there is a JSON syntax error
+     * @throws JsonSyntaxException if there is a JSON syntax error
      */
     public static ExposedJson parse(String raw)
     {
@@ -33,7 +33,7 @@ public class WhisperJson
      *
      * @return a SafeJson instance backed by the given array
      *
-     * @throws ParseException if there is a JSON syntax error
+     * @throws JsonSyntaxException if there is a JSON syntax error
      */
     public static SafeJson parse(char[] raw)
     {
@@ -59,7 +59,7 @@ public class WhisperJson
      *
      * @return a SafeJson instance
      *
-     * @throws ParseException if there is a JSON syntax error
+     * @throws JsonSyntaxException if there is a JSON syntax error
      * @throws IOException if an I/O error occurs
      */
     public static SafeJson parse(Reader reader) throws IOException
@@ -85,7 +85,7 @@ public class WhisperJson
      *
      * @return a SafeJson instance
      *
-     * @throws ParseException if there is a JSON syntax error
+     * @throws JsonSyntaxException if there is a JSON syntax error
      * @throws IOException if an I/O error occurs
      */
     public static SafeJson parse(InputStream inputStream, Charset charset) throws IOException

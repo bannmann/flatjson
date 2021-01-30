@@ -1,5 +1,7 @@
 package com.github.bannmann.whisperjson;
 
+import com.github.mizool.core.exception.CodeInconsistencyException;
+
 @SuppressWarnings("java:S1610")
 abstract class Factory<J extends Json<J>, O extends Overlay<?>>
 {
@@ -28,7 +30,7 @@ abstract class Factory<J extends Json<J>, O extends Overlay<?>>
                 case OBJECT:
                     return new Objct.Exposed(overlay, element, this);
                 default:
-                    throw new ParseException("unknown type: " + type);
+                    throw new CodeInconsistencyException("unknown type: " + type);
             }
         }
     }
@@ -58,7 +60,7 @@ abstract class Factory<J extends Json<J>, O extends Overlay<?>>
                 case OBJECT:
                     return new Objct.Safe(overlay, element, this);
                 default:
-                    throw new ParseException("unknown type: " + type);
+                    throw new CodeInconsistencyException("unknown type: " + type);
             }
         }
     }

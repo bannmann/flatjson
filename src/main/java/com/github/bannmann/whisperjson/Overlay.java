@@ -99,19 +99,20 @@ abstract class Overlay<T extends Text<T>>
             int last = skipWhitespace(parseValue(0));
             if (last != text.length())
             {
-                throw new ParseException("malformed json");
+                throw new JsonSyntaxException("malformed json", Math.min(last, text.length()));
             }
         }
         catch (IndexOutOfBoundsException e)
         {
-            throw new ParseException("unbalanced json");
+            throw new JsonSyntaxException("unbalanced json", e);
         }
     }
 
     private int parseValue(int i)
     {
         i = skipWhitespace(i);
-        switch (text.charAt(i))
+        char c = text.charAt(i);
+        switch (c)
         {
             case '"':
                 return parseString(i);
@@ -138,7 +139,7 @@ abstract class Overlay<T extends Text<T>>
             case 'n':
                 return parseNull(i);
             default:
-                throw new ParseException("illegal char at pos: " + i);
+                throw new JsonSyntaxException("illegal char", c, i);
         }
     }
 
@@ -156,7 +157,7 @@ abstract class Overlay<T extends Text<T>>
             {
                 if (i > from)
                 {
-                    throw new ParseException("minus inside number");
+                    throw new JsonSyntaxException("minus inside number", i);
                 }
                 minus = true;
             }
@@ -164,7 +165,7 @@ abstract class Overlay<T extends Text<T>>
             {
                 if (exponent)
                 {
-                    throw new ParseException("double exponents");
+                    throw new JsonSyntaxException("double exponents", i);
                 }
                 leadingZero = false;
                 exponent = true;
@@ -174,7 +175,7 @@ abstract class Overlay<T extends Text<T>>
                     c = text.charAt(i + 2);
                     if (c < '0' || c > '9')
                     {
-                        throw new ParseException("invalid exponent");
+                        throw new JsonSyntaxException("invalid exponent", c, i);
                     }
                     i += 2;
                 }
@@ -184,18 +185,18 @@ abstract class Overlay<T extends Text<T>>
                 }
                 else
                 {
-                    throw new ParseException("invalid exponent");
+                    throw new JsonSyntaxException("invalid exponent", c, i);
                 }
             }
             else if (c == '.')
             {
                 if (dot)
                 {
-                    throw new ParseException("multiple dots");
+                    throw new JsonSyntaxException("multiple dots", i);
                 }
                 if (i == from || (minus && (i == from + 1)))
                 {
-                    throw new ParseException("no digit before dot");
+                    throw new JsonSyntaxException("no digit before dot", i);
                 }
                 leadingZero = false;
                 dot = true;
@@ -211,7 +212,7 @@ abstract class Overlay<T extends Text<T>>
             {
                 if (leadingZero)
                 {
-                    throw new ParseException("leading zero");
+                    throw new JsonSyntaxException("leading zero", i);
                 }
             }
             else
@@ -222,7 +223,7 @@ abstract class Overlay<T extends Text<T>>
         }
         if (minus && from == i - 1)
         {
-            throw new ParseException("isolated minus");
+            throw new JsonSyntaxException("isolated minus", i);
         }
         return createElement(Type.NUMBER, from, i - 1, 0);
     }
@@ -241,7 +242,7 @@ abstract class Overlay<T extends Text<T>>
             }
             else if (c < 32)
             {
-                throw new ParseException("illegal control char: " + (int) c);
+                throw new JsonSyntaxException(String.format("illegal control char %d", (int) c), i);
             }
             else if (c == '\\')
             {
@@ -261,7 +262,7 @@ abstract class Overlay<T extends Text<T>>
                 }
                 else
                 {
-                    throw new ParseException("illegal escape char: " + c);
+                    throw new JsonSyntaxException("illegal escape char", c, i);
                 }
             }
             i++;
@@ -361,11 +362,19 @@ abstract class Overlay<T extends Text<T>>
         return i;
     }
 
-    private void expectChar(int i, char c)
+    private void expectChar(int index, char expected)
     {
-        if (text.charAt(i) != c)
+        try
         {
-            throw new ParseException("expected char '" + c + "' at pos " + i);
+            char found = text.charAt(index);
+            if (found != expected)
+            {
+                throw new JsonSyntaxException(String.format("expected char '%s', found '%s'", expected, found), index);
+            }
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            throw new JsonSyntaxException(String.format("expected char '%s', found EOF", expected), index);
         }
     }
 
@@ -376,7 +385,7 @@ abstract class Overlay<T extends Text<T>>
         {
             return;
         }
-        throw new ParseException("invalid hex char at pos " + i);
+        throw new JsonSyntaxException("invalid hex char", c, i);
     }
 
     private int getComponent(int element, int offset)

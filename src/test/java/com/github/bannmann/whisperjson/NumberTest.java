@@ -117,7 +117,7 @@ public class NumberTest
             "141592653589793238462643383279502884197169399375105820974944592307816406286"));
     }
 
-    @Test(dataProvider = "malformedNumbers", expectedExceptions = ParseException.class)
+    @Test(dataProvider = "malformedNumbers", expectedExceptions = JsonSyntaxException.class)
     public void parseMalformedNumbers(String label, String input)
     {
         WhisperJson.parse(input);
