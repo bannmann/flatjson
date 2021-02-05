@@ -56,16 +56,14 @@ abstract class Overlay<T extends Text<T>>
     private static final int NESTED = 3;
 
     protected final T text;
-    protected final List<int[]> blocks;
+    protected final List<int[]> blocks = new ArrayList<>();
     protected final int blockSize;
     protected int element;
 
     private Overlay(@NonNull T text)
     {
         this.text = text;
-        this.blocks = new ArrayList<>();
         this.blockSize = calculateBlockSize(text.length());
-        this.element = 0;
         parse();
     }
 

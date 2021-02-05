@@ -1,8 +1,9 @@
 package com.github.bannmann.whisperjson;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import com.google.common.collect.ImmutableMap;
 
 abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Structure<J, O, F>
 {
@@ -57,7 +58,7 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
 
     private Map<String, J> createMap()
     {
-        Map<String, J> result = new LinkedHashMap<>();
+        ImmutableMap.Builder<String, J> result = ImmutableMap.builder();
         int e = element + 1;
         while (e <= element + overlay.getNested(element))
         {
@@ -66,7 +67,7 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
             result.put(key, factory.create(overlay, e + 1));
             e += overlay.getNested(e + 1) + 2;
         }
-        return result;
+        return result.build();
     }
 
     @Override

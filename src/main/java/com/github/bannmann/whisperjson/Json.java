@@ -80,11 +80,17 @@ public interface Json<J extends Json<J>>
         throw new IllegalStateException("not a string");
     }
 
+    /**
+     * @return an immutable list with the contents of this array. May be empty, but never {@code null}.
+     */
     default List<J> asArray()
     {
         throw new IllegalStateException("not an array");
     }
 
+    /**
+     * @return an immutable map with the contents of this object. May be empty, but never {@code null}.
+     */
     default Map<String, J> asObject()
     {
         throw new IllegalStateException("not an object");

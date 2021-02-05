@@ -1,8 +1,9 @@
 package com.github.bannmann.whisperjson;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.google.common.collect.ImmutableList;
 
 abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Structure<J, O, F>
 {
@@ -56,14 +57,14 @@ abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J
 
     private List<J> createList()
     {
-        List<J> result = new ArrayList<>();
+        ImmutableList.Builder<J> result = ImmutableList.builder();
         int e = element + 1;
         while (e <= element + overlay.getNested(element))
         {
             result.add(factory.create(overlay, e));
             e += overlay.getNested(e) + 1;
         }
-        return result;
+        return result.build();
     }
 
     @Override
