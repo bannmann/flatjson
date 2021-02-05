@@ -199,6 +199,12 @@ public class JsonTest
             });
     }
 
+    @Test(expectedExceptions = NullPointerException.class)
+    public void parseNull()
+    {
+        WhisperJson.parse((String) null);
+    }
+
     @Test(dataProvider = "malformedJson", expectedExceptions = JsonSyntaxException.class)
     public void parseFailure(String label, String input)
     {
@@ -209,7 +215,6 @@ public class JsonTest
     public static Object[][] malformedJson()
     {
         return new Object[][]{
-            new Object[]{ "null", null },
             new Object[]{ "empty", "" },
             new Object[]{ "whitespace", "  \r\n  \t " },
             new Object[]{ "broken null", "nul" },

@@ -4,19 +4,20 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 abstract class Text<T extends Text<T>>
 {
+    @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
     public static class Exposed extends Text<Exposed>
     {
+        @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
         private static class CharacterIterator implements Iterator<Character>
         {
             private final String string;
             private int position;
-
-            private CharacterIterator(String string)
-            {
-                this.string = string;
-            }
 
             @Override
             public boolean hasNext()
@@ -38,16 +39,8 @@ abstract class Text<T extends Text<T>>
             }
         }
 
+        @NonNull
         private final String contents;
-
-        public Exposed(String contents)
-        {
-            if (contents == null)
-            {
-                throw new ParseException("cannot parse null");
-            }
-            this.contents = contents;
-        }
 
         @Override
         public char charAt(int index)
@@ -99,17 +92,14 @@ abstract class Text<T extends Text<T>>
         }
     }
 
+    @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
     public static class Safe extends Text<Safe> implements AutoCloseable
     {
+        @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
         private static class CharacterIterator implements Iterator<Character>
         {
             private final char[] array;
             private int position;
-
-            private CharacterIterator(char[] array)
-            {
-                this.array = array;
-            }
 
             @Override
             public boolean hasNext()
@@ -124,16 +114,8 @@ abstract class Text<T extends Text<T>>
             }
         }
 
+        @NonNull
         private final char[] contents;
-
-        public Safe(char[] contents)
-        {
-            if (contents == null)
-            {
-                throw new ParseException("cannot parse null");
-            }
-            this.contents = contents;
-        }
 
         @Override
         public char charAt(int index)
@@ -176,7 +158,7 @@ abstract class Text<T extends Text<T>>
         }
 
         @Override
-        protected Safe newInstance(char[] chars)
+        protected Safe newInstance(@NonNull char[] chars)
         {
             return new Safe(chars);
         }

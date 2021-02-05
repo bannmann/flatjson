@@ -2,6 +2,10 @@ package com.github.bannmann.whisperjson;
 
 import java.util.Optional;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>> implements Json<J>
 {
     public static class Exposed extends Strng<ExposedJson, Overlay.Exposed, Text.Exposed> implements ExposedJson
@@ -40,12 +44,6 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
     protected final O overlay;
     protected final int element;
     private T text;
-
-    protected Strng(O overlay, int element)
-    {
-        this.overlay = overlay;
-        this.element = element;
-    }
 
     @Override
     public boolean isString()

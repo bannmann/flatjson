@@ -34,7 +34,7 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
 
     private Map<String, J> map;
 
-    protected Objct(O overlay, int element, F factory)
+    private Objct(O overlay, int element, F factory)
     {
         super(overlay, element, factory);
     }

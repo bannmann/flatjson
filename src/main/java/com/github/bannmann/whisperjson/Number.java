@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 abstract class Number<J extends Json<J>> implements Json<J>
 {
     public static final class Exposed extends Number<ExposedJson> implements ExposedJson
@@ -23,11 +27,6 @@ abstract class Number<J extends Json<J>> implements Json<J>
     }
 
     private final String value;
-
-    protected Number(String value)
-    {
-        this.value = value;
-    }
 
     @Override
     public boolean isNumber()

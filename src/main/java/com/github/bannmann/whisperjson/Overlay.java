@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.NonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 
 abstract class Overlay<T extends Text<T>>
 {
     public static final class Exposed extends Overlay<Text.Exposed>
     {
-        public Exposed(String raw)
+        public Exposed(@NonNull String raw)
         {
             super(new Text.Exposed(raw));
         }
@@ -18,12 +20,12 @@ abstract class Overlay<T extends Text<T>>
 
     public static final class Safe extends Overlay<Text.Safe> implements AutoCloseable
     {
-        public Safe(char[] raw)
+        public Safe(@NonNull char[] raw)
         {
             super(new Text.Safe(raw));
         }
 
-        public Safe(Text.Safe text)
+        public Safe(@NonNull Text.Safe text)
         {
             super(text);
         }
@@ -58,12 +60,8 @@ abstract class Overlay<T extends Text<T>>
     protected final int blockSize;
     protected int element;
 
-    protected Overlay(T text)
+    private Overlay(@NonNull T text)
     {
-        if (text == null)
-        {
-            throw new ParseException("cannot parse null");
-        }
         this.text = text;
         this.blocks = new ArrayList<>();
         this.blockSize = calculateBlockSize(text.length());

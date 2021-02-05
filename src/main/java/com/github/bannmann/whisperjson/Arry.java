@@ -33,7 +33,7 @@ abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J
 
     private List<J> list;
 
-    protected Arry(O overlay, int element, F factory)
+    private Arry(O overlay, int element, F factory)
     {
         super(overlay, element, factory);
     }

@@ -1,5 +1,9 @@
 package com.github.bannmann.whisperjson;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 abstract class Bool<J extends Json<J>> implements Json<J>
 {
     public static final class Exposed extends Bool<ExposedJson> implements ExposedJson
@@ -25,11 +29,6 @@ abstract class Bool<J extends Json<J>> implements Json<J>
     }
 
     private final boolean value;
-
-    private Bool(boolean value)
-    {
-        this.value = value;
-    }
 
     @Override
     public boolean isBoolean()
