@@ -4,12 +4,20 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import lombok.NonNull;
 
 public interface Json<J extends Json<J>>
 {
     default boolean isNull()
     {
         return false;
+    }
+
+    default boolean isAnyNonNull()
+    {
+        return !isNull();
     }
 
     default boolean isBoolean()
@@ -86,5 +94,11 @@ public interface Json<J extends Json<J>>
     default Map<String, J> asObject()
     {
         throw new IllegalStateException("not an object");
+    }
+
+    default Optional<J> getObjectProperty(@NonNull String name)
+    {
+        return Optional.ofNullable(asObject().get(name))
+            .filter(J::isAnyNonNull);
     }
 }
