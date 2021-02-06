@@ -2,7 +2,6 @@ package com.github.bannmann.whisperjson;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
 import java.util.function.Function;
 
 class TextBuilder implements AutoCloseable
@@ -40,7 +39,7 @@ class TextBuilder implements AutoCloseable
         }
         finally
         {
-            Arrays.fill(buffer, (char) 0);
+            Credentials.wipe(buffer);
         }
     }
 

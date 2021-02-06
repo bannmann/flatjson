@@ -30,6 +30,18 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
         }
 
         @Override
+        public char[] asCharArray()
+        {
+            return getOrCreateText().asCharArray();
+        }
+
+        @Override
+        public SensitiveText asSensitiveText()
+        {
+            return getOrCreateText().asSensitiveText();
+        }
+
+        @Override
         public void close()
         {
             if (element == 0)
@@ -63,12 +75,6 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
     protected final Optional<T> getText()
     {
         return Optional.ofNullable(text);
-    }
-
-    @Override
-    public char[] asCharArray()
-    {
-        return getOrCreateText().asCharArray();
     }
 
     @Override

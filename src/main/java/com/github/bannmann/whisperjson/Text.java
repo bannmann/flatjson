@@ -139,6 +139,11 @@ abstract class Text<T extends Text<T>>
             return new Safe(result);
         }
 
+        public SensitiveText asSensitiveText()
+        {
+            return new SensitiveText(contents);
+        }
+
         @Override
         public char[] asCharArray()
         {
@@ -172,7 +177,7 @@ abstract class Text<T extends Text<T>>
         @Override
         public void close()
         {
-            Arrays.fill(contents, (char) 0);
+            Credentials.wipe(contents);
         }
     }
 

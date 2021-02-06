@@ -64,6 +64,17 @@ public class SafeJsonTest
         {
             assertThat(username.asCharArray()).isEqualTo(EXPECTED_USERNAME);
             assertThat(password.asCharArray()).isEqualTo(EXPECTED_PASSWORD);
+
+            assertContentsViaSensitiveText(username, EXPECTED_USERNAME);
+            assertContentsViaSensitiveText(password, EXPECTED_PASSWORD);
+        }
+    }
+
+    private void assertContentsViaSensitiveText(SafeJson json, char[] chars)
+    {
+        try (SensitiveText text = json.asSensitiveText())
+        {
+            assertThat(text.newDependentArray()).isEqualTo(chars);
         }
     }
 
@@ -118,7 +129,7 @@ public class SafeJsonTest
 
             // Determine whether the internal array was wiped by retrieving a copy of it
             char[] failedRead = password.asCharArray();
-            assertThat(isWiped(failedRead)).describedAs("non-wiped array after closing")
+            assertThat(isWiped(failedRead)).overridingErrorMessage("non-wiped array after closing")
                 .isTrue();
             assertThat(failedRead.length).isEqualTo(EXPECTED_PASSWORD.length);
         }

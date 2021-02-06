@@ -73,14 +73,6 @@ public interface Json<J extends Json<J>>
     }
 
     /**
-     * @return a new array with a copy of the contents of this JSON string
-     */
-    default char[] asCharArray()
-    {
-        throw new IllegalStateException("not a string");
-    }
-
-    /**
      * @return an immutable list with the contents of this array. May be empty, but never {@code null}.
      */
     default List<J> asArray()
