@@ -1,59 +1,52 @@
 package com.github.bannmann.whisperjson;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 enum Type
 {
-    NULL
+    NULL(TypeLabel.NULL)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
                 O overlay, int element, F factory)
             {
-                return factory.createNull();
+                return factory.createNull(overlay, element);
             }
         },
 
-    TRUE
+    TRUE(TypeLabel.BOOLEAN)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
                 O overlay, int element, F factory)
             {
-                return factory.createTrue();
+                return factory.createTrue(overlay, element);
             }
         },
 
-    FALSE
+    FALSE(TypeLabel.BOOLEAN)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
                 O overlay, int element, F factory)
             {
-                return factory.createFalse();
+                return factory.createFalse(overlay, element);
             }
         },
 
-    NUMBER
+    NUMBER(TypeLabel.NUMBER)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
                 O overlay, int element, F factory)
             {
-                return factory.createNumber(overlay.getJson(element)
-                    .asString());
+                return factory.createNumber(overlay, element);
             }
         },
 
-    STRING
-        {
-            @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
-                O overlay, int element, F factory)
-            {
-                return factory.createString(overlay, element);
-            }
-        },
-
-    STRING_ESCAPED
+    STRING(TypeLabel.STRING)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
@@ -63,7 +56,17 @@ enum Type
             }
         },
 
-    ARRAY
+    STRING_ESCAPED(TypeLabel.STRING)
+        {
+            @Override
+            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+                O overlay, int element, F factory)
+            {
+                return factory.createString(overlay, element);
+            }
+        },
+
+    ARRAY(TypeLabel.ARRAY)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
@@ -73,7 +76,7 @@ enum Type
             }
         },
 
-    OBJECT
+    OBJECT(TypeLabel.OBJECT)
         {
             @Override
             public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
@@ -82,6 +85,9 @@ enum Type
                 return factory.createObject(overlay, element, factory);
             }
         };
+
+    @Getter
+    private final TypeLabel label;
 
     public abstract <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
         O overlay, int element, F factory);

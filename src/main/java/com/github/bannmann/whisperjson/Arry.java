@@ -28,6 +28,7 @@ abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J
             if (element == 0)
             {
                 overlay.close();
+                factory.close();
             }
         }
     }

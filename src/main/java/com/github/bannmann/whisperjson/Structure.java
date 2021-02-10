@@ -1,12 +1,12 @@
 package com.github.bannmann.whisperjson;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-abstract class Structure<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> implements Json<J>
+abstract class Structure<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Element<J, O>
 {
-    protected final O overlay;
-    protected final int element;
     protected final F factory;
+
+    protected Structure(O overlay, int element, F factory)
+    {
+        super(overlay, element);
+        this.factory = factory;
+    }
 }

@@ -29,6 +29,7 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
             if (element == 0)
             {
                 overlay.close();
+                factory.close();
             }
         }
     }

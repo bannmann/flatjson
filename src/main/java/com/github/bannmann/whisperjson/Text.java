@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import com.google.common.annotations.VisibleForTesting;
+
 abstract class Text<T extends Text<T>>
 {
     @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
@@ -92,7 +94,6 @@ abstract class Text<T extends Text<T>>
         }
     }
 
-    @RequiredArgsConstructor(access = AccessLevel.PUBLIC)
     public static class Safe extends Text<Safe> implements AutoCloseable
     {
         @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -114,19 +115,24 @@ abstract class Text<T extends Text<T>>
             }
         }
 
-        @NonNull
-        private final char[] contents;
+        @VisibleForTesting
+        char[] contents;
+
+        public Safe(@NonNull char[] contents)
+        {
+            this.contents = contents;
+        }
 
         @Override
         public char charAt(int index)
         {
-            return contents[index];
+            return obtainContents()[index];
         }
 
         @Override
         public int length()
         {
-            return contents.length;
+            return obtainContents().length;
         }
 
         @Override
@@ -135,31 +141,31 @@ abstract class Text<T extends Text<T>>
             int length = endIndex - beginIndex;
             char[] result = new char[length];
 
-            System.arraycopy(contents, beginIndex, result, 0, length);
+            System.arraycopy(obtainContents(), beginIndex, result, 0, length);
             return new Safe(result);
         }
 
         public SensitiveText asSensitiveText()
         {
-            return new SensitiveText(contents);
+            return new SensitiveText(obtainContents());
         }
 
         @Override
         public char[] asCharArray()
         {
-            return Arrays.copyOf(contents, contents.length);
+            return Arrays.copyOf(obtainContents(), obtainContents().length);
         }
 
         @Override
         public String asString()
         {
-            return new String(contents);
+            return new String(obtainContents());
         }
 
         @Override
         public Iterator<Character> getCharacters()
         {
-            return new CharacterIterator(contents);
+            return new CharacterIterator(obtainContents());
         }
 
         @Override
@@ -178,6 +184,16 @@ abstract class Text<T extends Text<T>>
         public void close()
         {
             Credentials.wipe(contents);
+            contents = null;
+        }
+
+        private char[] obtainContents()
+        {
+            if (contents == null)
+            {
+                throw new IllegalStateException();
+            }
+            return contents;
         }
     }
 

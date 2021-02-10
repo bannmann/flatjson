@@ -1,6 +1,7 @@
 package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
@@ -118,26 +119,38 @@ public class SafeJsonTest
     public void copiedTextWiped()
     {
         try (SafeJson root = WhisperJson.parse(inputCharacters);
-             SafeJson password = root.asObject()
+             SafeJson passwordElement = root.asObject()
                  .get("password"))
         {
             // Simulate application code retrieving the text contents before closing the SafeJson instance
-            char[] successfulRead = password.asCharArray();
-            password.close();
+            char[] successfulRead = passwordElement.asCharArray();
+
+            // Closing the password element will null its array reference, so we get a copy now that we can check later
+            char[] internalArray = ((Strng.Safe) passwordElement).text.contents;
+
+            passwordElement.close();
 
             assertThat(successfulRead).isEqualTo(EXPECTED_PASSWORD);
-
-            // Determine whether the internal array was wiped by retrieving a copy of it
-            char[] failedRead = password.asCharArray();
-            assertThat(isWiped(failedRead)).overridingErrorMessage("non-wiped array after closing")
+            assertThat(isWiped(internalArray)).overridingErrorMessage("non-wiped array after closing")
                 .isTrue();
-            assertThat(failedRead.length).isEqualTo(EXPECTED_PASSWORD.length);
+            assertThatThrownBy(passwordElement::asCharArray).isInstanceOf(IllegalStateException.class);
         }
 
         if (!isInputWiped())
         {
             fail("Input was not wiped:\n" + new String(inputCharacters));
         }
+    }
+
+    @Test
+    public void transitiveClose()
+    {
+        SafeJson root = WhisperJson.parse(inputCharacters);
+        SafeJson passwordElement = root.asObject()
+            .get("password");
+        root.close();
+
+        assertThatThrownBy(passwordElement::asCharArray).isInstanceOf(IllegalStateException.class);
     }
 
     @Test

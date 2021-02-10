@@ -2,11 +2,9 @@ package com.github.bannmann.whisperjson;
 
 import java.util.Optional;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import com.google.common.annotations.VisibleForTesting;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>> implements Json<J>
+abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>> extends Element<J, O>
 {
     public static class Exposed extends Strng<ExposedJson, Overlay.Exposed, Text.Exposed> implements ExposedJson
     {
@@ -24,6 +22,8 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
 
     public static class Safe extends Strng<SafeJson, Overlay.Safe, Text.Safe> implements SafeJson
     {
+        private boolean closed;
+
         public Safe(Overlay.Safe overlay, int element)
         {
             super(overlay, element);
@@ -50,12 +50,28 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
             }
 
             getText().ifPresent(Text.Safe::close);
+
+            closed = true;
+        }
+
+        @Override
+        protected Text.Safe getOrCreateText()
+        {
+            if (closed)
+            {
+                throw new IllegalStateException();
+            }
+            return super.getOrCreateText();
         }
     }
 
-    protected final O overlay;
-    protected final int element;
-    private T text;
+    @VisibleForTesting
+    T text;
+
+    private Strng(O overlay, int element)
+    {
+        super(overlay, element);
+    }
 
     @Override
     public boolean isString()
@@ -63,7 +79,7 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
         return true;
     }
 
-    protected final T getOrCreateText()
+    protected T getOrCreateText()
     {
         if (text == null)
         {

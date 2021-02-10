@@ -1,20 +1,26 @@
 package com.github.bannmann.whisperjson;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
-abstract class Null<J extends Json<J>> implements Json<J>
+abstract class Null<J extends Json<J>, O extends Overlay<?>> extends Element<J, O>
 {
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Exposed extends Null<ExposedJson> implements ExposedJson
+    public static final class Exposed extends Null<ExposedJson, Overlay.Exposed> implements ExposedJson
     {
-        public static final Exposed INSTANCE = new Exposed();
+        protected Exposed(Overlay.Exposed overlay, int element)
+        {
+            super(overlay, element);
+        }
     }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Safe extends Null<SafeJson> implements SafeJson
+    public static final class Safe extends Null<SafeJson, Overlay.Safe> implements SafeJson
     {
-        public static final Safe INSTANCE = new Safe();
+        protected Safe(Overlay.Safe overlay, int element)
+        {
+            super(overlay, element);
+        }
+    }
+
+    protected Null(O overlay, int element)
+    {
+        super(overlay, element);
     }
 
     @Override
@@ -26,7 +32,7 @@ abstract class Null<J extends Json<J>> implements Json<J>
     @Override
     public boolean equals(Object o)
     {
-        return o instanceof Null<?>;
+        return o instanceof Null<?, ?>;
     }
 
     @Override

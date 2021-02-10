@@ -1,34 +1,30 @@
 package com.github.bannmann.whisperjson;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-abstract class Bool<J extends Json<J>> implements Json<J>
+abstract class Bool<J extends Json<J>, O extends Overlay<?>> extends Element<J, O>
 {
-    public static final class Exposed extends Bool<ExposedJson> implements ExposedJson
+    public static final class Exposed extends Bool<ExposedJson, Overlay.Exposed> implements ExposedJson
     {
-        public static final Exposed TRUE = new Exposed(true);
-        public static final Exposed FALSE = new Exposed(false);
-
-        private Exposed(boolean value)
+        protected Exposed(Overlay.Exposed overlay, int element, boolean value)
         {
-            super(value);
+            super(value, overlay, element);
         }
     }
 
-    public static final class Safe extends Bool<SafeJson> implements SafeJson
+    public static final class Safe extends Bool<SafeJson, Overlay.Safe> implements SafeJson
     {
-        public static final Safe TRUE = new Safe(true);
-        public static final Safe FALSE = new Safe(false);
-
-        private Safe(boolean value)
+        protected Safe(Overlay.Safe overlay, int element, boolean value)
         {
-            super(value);
+            super(value, overlay, element);
         }
     }
 
     private final boolean value;
+
+    protected Bool(boolean value, O overlay, int element)
+    {
+        super(overlay, element);
+        this.value = value;
+    }
 
     @Override
     public boolean isBoolean()
@@ -45,9 +41,9 @@ abstract class Bool<J extends Json<J>> implements Json<J>
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Bool<?>)
+        if (o instanceof Bool<?, ?>)
         {
-            Bool<?> other = (Bool<?>) o;
+            Bool<?, ?> other = (Bool<?, ?>) o;
             return other.value == value;
         }
         return false;

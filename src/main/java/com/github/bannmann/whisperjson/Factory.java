@@ -1,32 +1,35 @@
 package com.github.bannmann.whisperjson;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @SuppressWarnings("java:S1610")
 abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>>
 {
     public static final class Exposed extends Factory<ExposedJson, Overlay.Exposed, Exposed>
     {
         @Override
-        public ExposedJson createNull()
+        public ExposedJson createNull(Overlay.Exposed overlay, int element)
         {
-            return Null.Exposed.INSTANCE;
+            return new Null.Exposed(overlay, element);
         }
 
         @Override
-        public ExposedJson createTrue()
+        public ExposedJson createTrue(Overlay.Exposed overlay, int element)
         {
-            return Bool.Exposed.TRUE;
+            return new Bool.Exposed(overlay, element, true);
         }
 
         @Override
-        public ExposedJson createFalse()
+        public ExposedJson createFalse(Overlay.Exposed overlay, int element)
         {
-            return Bool.Exposed.FALSE;
+            return new Bool.Exposed(overlay, element, false);
         }
 
         @Override
-        public ExposedJson createNumber(String asString)
+        public ExposedJson createNumber(Overlay.Exposed overlay, int element)
         {
-            return new Number.Exposed(asString);
+            return new Number.Exposed(overlay, element);
         }
 
         @Override
@@ -54,36 +57,40 @@ abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factor
         }
     }
 
-    public static final class Safe extends Factory<SafeJson, Overlay.Safe, Safe>
+    public static final class Safe extends Factory<SafeJson, Overlay.Safe, Safe> implements AutoCloseable
     {
+        private final List<Strng.Safe> stringElements = new LinkedList<>();
+
         @Override
-        public SafeJson createNull()
+        public SafeJson createNull(Overlay.Safe overlay, int element)
         {
-            return Null.Safe.INSTANCE;
+            return new Null.Safe(overlay, element);
         }
 
         @Override
-        public SafeJson createTrue()
+        public SafeJson createTrue(Overlay.Safe overlay, int element)
         {
-            return Bool.Safe.TRUE;
+            return new Bool.Safe(overlay, element, true);
         }
 
         @Override
-        public SafeJson createFalse()
+        public SafeJson createFalse(Overlay.Safe overlay, int element)
         {
-            return Bool.Safe.FALSE;
+            return new Bool.Safe(overlay, element, false);
         }
 
         @Override
-        public SafeJson createNumber(String asString)
+        public SafeJson createNumber(Overlay.Safe overlay, int element)
         {
-            return new Number.Safe(asString);
+            return new Number.Safe(overlay, element);
         }
 
         @Override
         public SafeJson createString(Overlay.Safe overlay, int element)
         {
-            return new Strng.Safe(overlay, element);
+            Strng.Safe result = new Strng.Safe(overlay, element);
+            stringElements.add(result);
+            return result;
         }
 
         @Override
@@ -103,6 +110,16 @@ abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factor
         {
             return this;
         }
+
+        @Override
+        public void close()
+        {
+            for (Strng.Safe stringElement : stringElements)
+            {
+                stringElement.close();
+            }
+            stringElements.clear();
+        }
     }
 
     public final J create(O overlay, int element)
@@ -111,13 +128,13 @@ abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factor
             .create(overlay, element, getSelf());
     }
 
-    public abstract J createNull();
+    public abstract J createNull(O overlay, int element);
 
-    public abstract J createTrue();
+    public abstract J createTrue(O overlay, int element);
 
-    public abstract J createFalse();
+    public abstract J createFalse(O overlay, int element);
 
-    public abstract J createNumber(String asString);
+    public abstract J createNumber(O overlay, int element);
 
     public abstract J createString(O overlay, int element);
 

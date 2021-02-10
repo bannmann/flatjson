@@ -82,6 +82,11 @@ abstract class Overlay<T extends Text<T>>
         return text.getPart(getComponent(element, FROM), getComponent(element, TO) + 1);
     }
 
+    public int getOffset(int element)
+    {
+        return getComponent(element, FROM);
+    }
+
     public T getUnescapedText(int element)
     {
         T value = text.getPart(getComponent(element, FROM) + 1, getComponent(element, TO));

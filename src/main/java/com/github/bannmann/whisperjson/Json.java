@@ -10,95 +10,43 @@ import lombok.NonNull;
 
 public interface Json<J extends Json<J>>
 {
-    default boolean isNull()
-    {
-        return false;
-    }
+    boolean isNull();
 
-    default boolean isAnyNonNull()
-    {
-        return !isNull();
-    }
+    boolean isAnyNonNull();
 
-    default boolean isBoolean()
-    {
-        return false;
-    }
+    boolean isBoolean();
 
-    default boolean isNumber()
-    {
-        return false;
-    }
+    boolean isNumber();
 
-    default boolean isString()
-    {
-        return false;
-    }
+    boolean isString();
 
-    default boolean isArray()
-    {
-        return false;
-    }
+    boolean isArray();
 
-    default boolean isObject()
-    {
-        return false;
-    }
+    boolean isObject();
 
-    default boolean asBoolean()
-    {
-        throw new IllegalStateException("not a boolean");
-    }
+    boolean asBoolean();
 
-    default int asInt()
-    {
-        throw new IllegalStateException("not a number");
-    }
+    int asInt();
 
-    default long asLong()
-    {
-        throw new IllegalStateException("not a number");
-    }
+    long asLong();
 
-    default float asFloat()
-    {
-        throw new IllegalStateException("not a number");
-    }
+    float asFloat();
 
-    default double asDouble()
-    {
-        throw new IllegalStateException("not a number");
-    }
+    double asDouble();
 
-    default BigInteger asBigInteger()
-    {
-        throw new IllegalStateException("not a number");
-    }
+    BigInteger asBigInteger();
 
-    default BigDecimal asBigDecimal()
-    {
-        throw new IllegalStateException("not a number");
-    }
+    BigDecimal asBigDecimal();
 
     /**
      * @return an immutable list with the contents of this array. May be empty, but never {@code null}.
      */
-    default List<J> asArray()
-    {
-        throw new IllegalStateException("not an array");
-    }
+    List<J> asArray();
 
     /**
      * @return an immutable map with the contents of this object. May be empty, but never {@code null}.
      */
-    default Map<String, J> asObject()
-    {
-        throw new IllegalStateException("not an object");
-    }
+    Map<String, J> asObject();
 
-    default Optional<J> getObjectProperty(@NonNull String name)
-    {
-        return Optional.ofNullable(asObject().get(name))
-            .filter(J::isAnyNonNull);
-    }
+    Optional<J> getObjectProperty(@NonNull String name);
 }

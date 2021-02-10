@@ -4,29 +4,30 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-abstract class Number<J extends Json<J>> implements Json<J>
+abstract class Number<J extends Json<J>, O extends Overlay<?>> extends Element<J, O>
 {
-    public static final class Exposed extends Number<ExposedJson> implements ExposedJson
+    public static final class Exposed extends Number<ExposedJson, Overlay.Exposed> implements ExposedJson
     {
-        public Exposed(String value)
+        public Exposed(Overlay.Exposed overlay, int element)
         {
-            super(value);
+            super(overlay, element);
         }
     }
 
-    public static final class Safe extends Number<SafeJson> implements SafeJson
+    public static final class Safe extends Number<SafeJson, Overlay.Safe> implements SafeJson
     {
-        public Safe(String value)
+        public Safe(Overlay.Safe overlay, int element)
         {
-            super(value);
+            super(overlay, element);
         }
     }
 
-    private final String value;
+    private String value;
+
+    private Number(O overlay, int element)
+    {
+        super(overlay, element);
+    }
 
     @Override
     public boolean isNumber()
@@ -34,48 +35,58 @@ abstract class Number<J extends Json<J>> implements Json<J>
         return true;
     }
 
+    protected final String getOrCreateValue()
+    {
+        if (value == null)
+        {
+            value = overlay.getJson(element)
+                .asString();
+        }
+        return value;
+    }
+
     @Override
     public int asInt()
     {
-        return Integer.parseInt(value);
+        return Integer.parseInt(getOrCreateValue());
     }
 
     @Override
     public long asLong()
     {
-        return Long.parseLong(value);
+        return Long.parseLong(getOrCreateValue());
     }
 
     @Override
     public float asFloat()
     {
-        return Float.parseFloat(value);
+        return Float.parseFloat(getOrCreateValue());
     }
 
     @Override
     public double asDouble()
     {
-        return Double.parseDouble(value);
+        return Double.parseDouble(getOrCreateValue());
     }
 
     @Override
     public BigInteger asBigInteger()
     {
-        return new BigInteger(value);
+        return new BigInteger(getOrCreateValue());
     }
 
     @Override
     public BigDecimal asBigDecimal()
     {
-        return new BigDecimal(value);
+        return new BigDecimal(getOrCreateValue());
     }
 
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Number<?>)
+        if (o instanceof Number<?, ?>)
         {
-            Number<?> other = (Number<?>) o;
+            Number<?, ?> other = (Number<?, ?>) o;
             return Objects.equals(other.asBigDecimal(), asBigDecimal());
         }
         return false;

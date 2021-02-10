@@ -145,6 +145,18 @@ public class JsonTest
     }
 
     @Test
+    public void parseTypeMismatch()
+    {
+        ExposedJson json = WhisperJson.parse("{\"answer\": 42}");
+
+        ExposedJson answer = json.getObjectProperty("answer")
+            .orElseThrow(AssertionError::new);
+
+        assertThatThrownBy(answer::asString).isInstanceOf(TypeMismatchException.class)
+            .hasMessage("Type mismatch: expected string, got number at index 11");
+    }
+
+    @Test
     public void parseObject()
     {
         ExposedJson json = WhisperJson.parse("{\"foo\": true ,\n   \"bar\": false   }");
