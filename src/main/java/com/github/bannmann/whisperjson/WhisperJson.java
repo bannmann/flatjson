@@ -24,7 +24,7 @@ public class WhisperJson
      */
     public static ExposedJson parse(@NonNull String raw)
     {
-        return new Factory.Exposed().create(new Overlay.Exposed(raw), 0);
+        return parse(new Factory.Exposed(), new Overlay.Exposed(raw));
     }
 
     /**
@@ -43,7 +43,7 @@ public class WhisperJson
         // We don't close the overlay or factory as the SafeJson will close them
         Overlay.Safe overlay = new Overlay.Safe(raw);
 
-        return createSafeFactory().create(overlay, 0);
+        return parse(createSafeFactory(), overlay);
     }
 
     @SuppressWarnings("java:S2095")
@@ -75,7 +75,7 @@ public class WhisperJson
                 .build(Text.Safe::new);
             Overlay.Safe overlay = new Overlay.Safe(text);
 
-            return createSafeFactory().create(overlay, 0);
+            return parse(createSafeFactory(), overlay);
         }
     }
 
@@ -96,5 +96,14 @@ public class WhisperJson
     public static SafeJson parse(@NonNull InputStream inputStream, @NonNull Charset charset) throws IOException
     {
         return parse(new InputStreamReader(inputStream, charset));
+    }
+
+    private <J extends Json<J>, F extends Factory<J, O, F, T>, O extends Overlay<T>, T extends Text<T>> J parse(
+        F factory, O overlay)
+    {
+        new Parser<>(overlay).execute();
+
+        return overlay.getType(0)
+            .create(overlay, 0, factory);
     }
 }

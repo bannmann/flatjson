@@ -9,7 +9,7 @@ enum Type
     NULL(TypeLabel.NULL)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createNull(overlay, element);
@@ -19,7 +19,7 @@ enum Type
     TRUE(TypeLabel.BOOLEAN)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createTrue(overlay, element);
@@ -29,7 +29,7 @@ enum Type
     FALSE(TypeLabel.BOOLEAN)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createFalse(overlay, element);
@@ -39,7 +39,7 @@ enum Type
     NUMBER(TypeLabel.NUMBER)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createNumber(overlay, element);
@@ -49,7 +49,7 @@ enum Type
     STRING(TypeLabel.STRING)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createString(overlay, element);
@@ -59,7 +59,7 @@ enum Type
     STRING_ESCAPED(TypeLabel.STRING)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createString(overlay, element);
@@ -69,7 +69,7 @@ enum Type
     ARRAY(TypeLabel.ARRAY)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createArray(overlay, element, factory);
@@ -79,7 +79,7 @@ enum Type
     OBJECT(TypeLabel.OBJECT)
         {
             @Override
-            public <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+            public <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
                 O overlay, int element, F factory)
             {
                 return factory.createObject(overlay, element, factory);
@@ -89,6 +89,6 @@ enum Type
     @Getter
     private final TypeLabel label;
 
-    public abstract <J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> J create(
+    public abstract <J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>> J create(
         O overlay, int element, F factory);
 }

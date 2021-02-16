@@ -5,9 +5,10 @@ import java.util.Objects;
 
 import com.google.common.collect.ImmutableMap;
 
-abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Structure<J, O, F>
+abstract class Objct<J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>>
+    extends Structure<J, O, F, T>
 {
-    public static final class Exposed extends Objct<ExposedJson, Overlay.Exposed, Factory.Exposed>
+    public static final class Exposed extends Objct<ExposedJson, Overlay.Exposed, Factory.Exposed, Text.Exposed>
         implements ExposedJson
     {
         public Exposed(Overlay.Exposed overlay, int element, Factory.Exposed factory)
@@ -16,7 +17,7 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
         }
     }
 
-    public static final class Safe extends Objct<SafeJson, Overlay.Safe, Factory.Safe> implements SafeJson
+    public static final class Safe extends Objct<SafeJson, Overlay.Safe, Factory.Safe, Text.Safe> implements SafeJson
     {
         public Safe(Overlay.Safe overlay, int element, Factory.Safe factory)
         {
@@ -74,9 +75,9 @@ abstract class Objct<J extends Json<J>, O extends Overlay<?>, F extends Factory<
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Objct<?, ?, ?>)
+        if (o instanceof Objct<?, ?, ?, ?>)
         {
-            Objct<?, ?, ?> other = (Objct<?, ?, ?>) o;
+            Objct<?, ?, ?, ?> other = (Objct<?, ?, ?, ?>) o;
             return Objects.equals(other.asObject(), asObject());
         }
         return false;

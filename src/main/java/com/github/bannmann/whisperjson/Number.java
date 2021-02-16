@@ -87,7 +87,7 @@ abstract class Number<J extends Json<J>, O extends Overlay<?>> extends Element<J
         if (o instanceof Number<?, ?>)
         {
             Number<?, ?> other = (Number<?, ?>) o;
-            return Objects.equals(other.asBigDecimal(), asBigDecimal());
+            return Objects.equals(other.getOrCreateValue(), getOrCreateValue());
         }
         return false;
     }
@@ -95,6 +95,6 @@ abstract class Number<J extends Json<J>, O extends Overlay<?>> extends Element<J
     @Override
     public int hashCode()
     {
-        return asBigDecimal().hashCode();
+        return getOrCreateValue().hashCode();
     }
 }

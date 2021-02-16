@@ -1,6 +1,7 @@
 package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.within;
 
 import java.math.BigDecimal;
@@ -68,6 +69,8 @@ public class NumberTest
             new Object[]{ "single digit with exponent", "3e+7", 3e+7 },
             new Object[]{ "negative number with exponent", "-2e-2", -2e-2 },
             new Object[]{ "number with exponent", "33e12", 33e12 },
+            new Object[]{ "number with large exponent", "33e111", 33e111 },
+            new Object[]{ "number with leading zero exponent", "33e0013", 33e13 },
             new Object[]{ "number with exponent uppercase", "33E12", 33e12 },
             new Object[]{ "number with exponent plus", "33E+12", 33e12 },
             new Object[]{ "number with exponent minus", "33E-12", 33e-12 }
@@ -117,26 +120,37 @@ public class NumberTest
             "141592653589793238462643383279502884197169399375105820974944592307816406286"));
     }
 
-    @Test(dataProvider = "malformedNumbers", expectedExceptions = JsonSyntaxException.class)
-    public void parseMalformedNumbers(String label, String input)
+    @Test(dataProvider = "malformedNumbers")
+    public void parseMalformedNumbers(String label, String input, String expectedMessage)
     {
-        WhisperJson.parse(input);
+        assertThatExceptionOfType(JsonSyntaxException.class).isThrownBy(() -> WhisperJson.parse(input))
+            .withMessage(expectedMessage);
     }
 
     @DataProvider
     public static Object[][] malformedNumbers()
     {
         return new Object[][]{
-            new Object[]{ "minus", "-" },
-            new Object[]{ "leading zero", "023" },
-            new Object[]{ "empty exponent", "33E" },
-            new Object[]{ "empty exponent plus", "33E+" },
-            new Object[]{ "broken exponent", "33E++2" },
-            new Object[]{ "multiple exponents", "33E2E4" },
-            new Object[]{ "float with comma", "3,141" },
-            new Object[]{ "float starting with dot", ".141" },
-            new Object[]{ "negative float starting with dot", "-.141" },
-            new Object[]{ "float with double dot", "111..333" }
+            new Object[]{ "minus", "-", "isolated minus at index 0" },
+            new Object[]{ "additional minus", "--1", "minus inside number at index 1" },
+            new Object[]{ "minus inside number", "12-34", "minus inside number at index 2" },
+            new Object[]{ "plus sign", "+1", "illegal char '+' at index 0" },
+            new Object[]{ "leading zero", "023", "leading zero at index 0" },
+            new Object[]{ "illegal number character", "567B9", "malformed json at index 3" },
+            new Object[]{ "plus inside number", "22+1", "invalid number character '+' at index 2" },
+            new Object[]{ "empty exponent at EOF", "33E", "unexpected end of exponent at index 3" },
+            new Object[]{ "empty exponent in array", "[33E]", "invalid exponent ']' at index 4" },
+            new Object[]{ "plus-only exponent at EOF", "33E+", "unexpected end of exponent at index 4" },
+            new Object[]{ "plus-only exponent in array", "[33E+]", "invalid exponent ']' at index 5" },
+            new Object[]{ "additional plus in exponent", "33E++2", "invalid exponent '+' at index 4" },
+            new Object[]{ "plus inside exponent", "7e1+2", "invalid exponent '+' at index 3" },
+            new Object[]{ "minus inside exponent", "6481e1-2", "invalid exponent '-' at index 6" },
+            new Object[]{ "exponent with dot", "33E+21.5", "invalid exponent '.' at index 6" },
+            new Object[]{ "multiple exponents", "33E2E4", "additional exponent at index 4" },
+            new Object[]{ "float with comma", "3,141", "malformed json at index 1" },
+            new Object[]{ "float starting with dot", ".141", "illegal char '.' at index 0" },
+            new Object[]{ "negative float starting with dot", "-.141", "no digit before dot at index 1" },
+            new Object[]{ "float with double dot", "111..333", "multiple dots at index 3" }
         };
     }
 }

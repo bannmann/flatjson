@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("java:S1610")
-abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>>
+abstract class Factory<J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>>
 {
-    public static final class Exposed extends Factory<ExposedJson, Overlay.Exposed, Exposed>
+    public static final class Exposed extends Factory<ExposedJson, Overlay.Exposed, Exposed, Text.Exposed>
     {
         @Override
         public ExposedJson createNull(Overlay.Exposed overlay, int element)
@@ -57,7 +57,7 @@ abstract class Factory<J extends Json<J>, O extends Overlay<?>, F extends Factor
         }
     }
 
-    public static final class Safe extends Factory<SafeJson, Overlay.Safe, Safe> implements AutoCloseable
+    public static final class Safe extends Factory<SafeJson, Overlay.Safe, Safe, Text.Safe> implements AutoCloseable
     {
         private final List<Strng.Safe> stringElements = new LinkedList<>();
 

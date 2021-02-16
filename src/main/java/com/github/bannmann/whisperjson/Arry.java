@@ -5,9 +5,11 @@ import java.util.Objects;
 
 import com.google.common.collect.ImmutableList;
 
-abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J, O, F>> extends Structure<J, O, F>
+abstract class Arry<J extends Json<J>, O extends Overlay<T>, F extends Factory<J, O, F, T>, T extends Text<T>>
+    extends Structure<J, O, F, T>
 {
-    public static final class Exposed extends Arry<ExposedJson, Overlay.Exposed, Factory.Exposed> implements ExposedJson
+    public static final class Exposed extends Arry<ExposedJson, Overlay.Exposed, Factory.Exposed, Text.Exposed>
+        implements ExposedJson
     {
         public Exposed(Overlay.Exposed overlay, int element, Factory.Exposed factory)
         {
@@ -15,7 +17,7 @@ abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J
         }
     }
 
-    public static final class Safe extends Arry<SafeJson, Overlay.Safe, Factory.Safe> implements SafeJson
+    public static final class Safe extends Arry<SafeJson, Overlay.Safe, Factory.Safe, Text.Safe> implements SafeJson
     {
         public Safe(Overlay.Safe overlay, int element, Factory.Safe factory)
         {
@@ -71,9 +73,9 @@ abstract class Arry<J extends Json<J>, O extends Overlay<?>, F extends Factory<J
     @Override
     public boolean equals(Object o)
     {
-        if (o instanceof Arry<?, ?, ?>)
+        if (o instanceof Arry<?, ?, ?, ?>)
         {
-            Arry<?, ?, ?> other = (Arry<?, ?, ?>) o;
+            Arry<?, ?, ?, ?> other = (Arry<?, ?, ?, ?>) o;
             return Objects.equals(other.asArray(), asArray());
         }
         return false;
