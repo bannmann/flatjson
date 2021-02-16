@@ -20,6 +20,7 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
         }
     }
 
+    @SuppressWarnings("java:S2160")
     public static class Safe extends Strng<SafeJson, Overlay.Safe, Text.Safe> implements SafeJson
     {
         private boolean closed;
@@ -94,6 +95,7 @@ abstract class Strng<J extends Json<J>, O extends Overlay<T>, T extends Text<T>>
     }
 
     @Override
+    @SuppressWarnings("java:S2162") // Json.equals() mandates equality across implementations (similar to Collections).
     public boolean equals(Object o)
     {
         if (o instanceof Strng<?, ?, ?>)

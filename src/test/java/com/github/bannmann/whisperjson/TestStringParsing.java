@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class StringTest
+public class TestStringParsing
 {
     @Test(dataProvider = "strings")
     public void parseString(String label, String input, String expected)

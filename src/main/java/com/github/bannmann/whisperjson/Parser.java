@@ -3,8 +3,15 @@ package com.github.bannmann.whisperjson;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import com.google.common.base.CharMatcher;
+
 class Parser<T extends Text<T>>
 {
+    private static final CharMatcher HEX_DIGIT = CharMatcher.inRange('0', '9')
+        .or(CharMatcher.inRange('A', 'F'))
+        .or(CharMatcher.inRange('a', 'f'))
+        .precomputed();
+
     @RequiredArgsConstructor
     private class NumberParser
     {
@@ -86,7 +93,7 @@ class Parser<T extends Text<T>>
             }
             rejectIsolatedMinus();
             rejectIncompleteExponent();
-            createElement(Type.NUMBER, from, pos - 1, 0);
+            createLeafElement(Type.NUMBER, from, pos - 1);
         }
 
         private void rejectPlusOutsideExponent()
@@ -252,15 +259,15 @@ class Parser<T extends Text<T>>
 
     private void parseString()
     {
-        boolean escaped = false;
-        int from = pos++;
+        Type type = Type.STRING;
+        int from = pos;
+        pos++;
         while (true)
         {
             char c = getCurrentChar();
             if (c == '"')
             {
-                Type type = escaped ? Type.STRING_ESCAPED : Type.STRING;
-                createElement(type, from, pos, 0);
+                createLeafElement(type, from, pos);
                 return;
             }
             else if (c < 32)
@@ -269,7 +276,7 @@ class Parser<T extends Text<T>>
             }
             else if (c == '\\')
             {
-                escaped = true;
+                type = Type.STRING_ESCAPED;
                 pos++;
                 char escapeChar = getCurrentChar();
                 switch (escapeChar)
@@ -285,10 +292,7 @@ class Parser<T extends Text<T>>
                         break;
                     case 'u':
                         pos++;
-                        for (int end = pos + 4; pos < end; pos++)
-                        {
-                            expectHex();
-                        }
+                        expectFourHexDigits();
                         break;
                     default:
                         throw new JsonSyntaxException("illegal escape char", escapeChar, pos);
@@ -302,13 +306,13 @@ class Parser<T extends Text<T>>
     {
         int count = 0;
         int e = nextElementNumber;
-        openElement(Type.ARRAY);
+        openStructureElement(Type.ARRAY);
         while (true)
         {
             skipWhitespace();
             if (getCurrentChar() == ']')
             {
-                closeElement(e, nextElementNumber - e - 1);
+                closeStructureElement(e, nextElementNumber - e - 1);
                 return;
             }
             if (count > 0)
@@ -326,13 +330,13 @@ class Parser<T extends Text<T>>
     {
         int count = 0;
         int e = nextElementNumber;
-        openElement(Type.OBJECT);
+        openStructureElement(Type.OBJECT);
         while (true)
         {
             skipWhitespace();
             if (getCurrentChar() == '}')
             {
-                closeElement(e, nextElementNumber - e - 1);
+                closeStructureElement(e, nextElementNumber - e - 1);
                 return;
             }
             if (count > 0)
@@ -360,7 +364,7 @@ class Parser<T extends Text<T>>
         moveToNextChar('u');
         moveToNextChar('l');
         moveToNextChar('l');
-        createElement(Type.NULL, from, pos, 0);
+        createLeafElement(Type.NULL, from, pos);
     }
 
     private void moveToNextChar(char u)
@@ -375,7 +379,7 @@ class Parser<T extends Text<T>>
         moveToNextChar('r');
         moveToNextChar('u');
         moveToNextChar('e');
-        createElement(Type.TRUE, from, pos, 0);
+        createLeafElement(Type.TRUE, from, pos);
     }
 
     private void parseFalse()
@@ -385,7 +389,7 @@ class Parser<T extends Text<T>>
         moveToNextChar('l');
         moveToNextChar('s');
         moveToNextChar('e');
-        createElement(Type.FALSE, from, pos, 0);
+        createLeafElement(Type.FALSE, from, pos);
     }
 
     private void skipWhitespace()
@@ -418,18 +422,25 @@ class Parser<T extends Text<T>>
         }
         catch (IndexOutOfBoundsException e)
         {
-            throw new JsonSyntaxException(String.format("expected char '%s', found EOF", expected), pos);
+            throw new JsonSyntaxException(String.format("expected char '%s', found EOF", expected), pos, e);
         }
     }
 
-    private void expectHex()
+    private void expectFourHexDigits()
+    {
+        for (int end = pos + 4; pos < end; pos++)
+        {
+            expectHexDigit();
+        }
+    }
+
+    private void expectHexDigit()
     {
         char c = getCurrentChar();
-        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+        if (!HEX_DIGIT.matches(c))
         {
-            return;
+            throw new JsonSyntaxException("invalid hex char", c, pos);
         }
-        throw new JsonSyntaxException("invalid hex char", c, pos);
     }
 
     private char getCurrentChar()
@@ -437,21 +448,23 @@ class Parser<T extends Text<T>>
         return text.charAt(pos);
     }
 
-    private void openElement(Type type)
+    private void createLeafElement(Type type, int from, int to)
     {
-        overlay.createElement(nextElementNumber++, type, pos, -1, -1);
-        pos++;
-    }
-
-    private void createElement(Type type, int from, int to, int nested)
-    {
-        overlay.createElement(nextElementNumber++, type, from, to, nested);
+        overlay.createLeafElement(nextElementNumber, type, from, to);
+        nextElementNumber++;
         pos = to + 1;
     }
 
-    private void closeElement(int element, int nested)
+    private void openStructureElement(Type type)
     {
-        overlay.closeElement(element, pos, nested);
+        overlay.openStructureElement(nextElementNumber, type, pos);
+        nextElementNumber++;
+        pos++;
+    }
+
+    private void closeStructureElement(int element, int childCount)
+    {
+        overlay.closeStructureElement(element, pos, childCount);
         pos++;
     }
 }

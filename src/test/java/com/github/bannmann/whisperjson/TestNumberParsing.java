@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class NumberTest
+public class TestNumberParsing
 {
     @Test(dataProvider = "intVariants")
     public void parseInt(String label, String input, int expected)

@@ -35,7 +35,7 @@ abstract class Objct<J extends Json<J>, O extends Overlay<T>, F extends Factory<
         }
     }
 
-    private Map<String, J> map;
+    private ImmutableMap<String, J> map;
 
     private Objct(O overlay, int element, F factory)
     {
@@ -58,21 +58,22 @@ abstract class Objct<J extends Json<J>, O extends Overlay<T>, F extends Factory<
         return map;
     }
 
-    private Map<String, J> createMap()
+    private ImmutableMap<String, J> createMap()
     {
         ImmutableMap.Builder<String, J> result = ImmutableMap.builder();
         int e = element + 1;
-        while (e <= element + overlay.getNested(element))
+        while (e <= element + overlay.getChildCount(element))
         {
             String key = overlay.getUnescapedText(e)
                 .asString();
             result.put(key, factory.create(overlay, e + 1));
-            e += overlay.getNested(e + 1) + 2;
+            e += overlay.getChildCount(e + 1) + 2;
         }
         return result.build();
     }
 
     @Override
+    @SuppressWarnings("java:S2162") // Json.equals() mandates equality across implementations (similar to Collections).
     public boolean equals(Object o)
     {
         if (o instanceof Objct<?, ?, ?, ?>)

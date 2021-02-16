@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 import com.google.common.io.CharStreams;
 
-public class SafeJsonTest
+public class TestSafeJson
 {
     private static final String TEST_JSON = "SafeJsonTest.json";
     private static final char[] EXPECTED_USERNAME = { 'a', 'l', 'i', 'c', 'e' };

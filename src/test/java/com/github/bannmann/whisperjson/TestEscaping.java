@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class EscapeTest
+public class TestEscaping
 {
     @Test(dataProvider = "noEscapingNeeded")
     public void doNotEscape(String label, String input)

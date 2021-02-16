@@ -82,6 +82,7 @@ abstract class Number<J extends Json<J>, O extends Overlay<?>> extends Element<J
     }
 
     @Override
+    @SuppressWarnings("java:S2162") // Json.equals() mandates equality across implementations (similar to Collections).
     public boolean equals(Object o)
     {
         if (o instanceof Number<?, ?>)

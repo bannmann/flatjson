@@ -35,7 +35,7 @@ abstract class Arry<J extends Json<J>, O extends Overlay<T>, F extends Factory<J
         }
     }
 
-    private List<J> list;
+    private ImmutableList<J> list;
 
     private Arry(O overlay, int element, F factory)
     {
@@ -58,19 +58,20 @@ abstract class Arry<J extends Json<J>, O extends Overlay<T>, F extends Factory<J
         return list;
     }
 
-    private List<J> createList()
+    private ImmutableList<J> createList()
     {
         ImmutableList.Builder<J> result = ImmutableList.builder();
         int e = element + 1;
-        while (e <= element + overlay.getNested(element))
+        while (e <= element + overlay.getChildCount(element))
         {
             result.add(factory.create(overlay, e));
-            e += overlay.getNested(e) + 1;
+            e += overlay.getChildCount(e) + 1;
         }
         return result.build();
     }
 
     @Override
+    @SuppressWarnings("java:S2162") // Json.equals() mandates equality across implementations (similar to Collections).
     public boolean equals(Object o)
     {
         if (o instanceof Arry<?, ?, ?, ?>)

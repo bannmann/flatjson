@@ -28,15 +28,18 @@ abstract class Text<T extends Text<T>>
             }
 
             @Override
+            @SuppressWarnings("java:S2272")
             public Character next()
             {
                 try
                 {
-                    return string.charAt(position++);
+                    char result = string.charAt(position);
+                    position++;
+                    return result;
                 }
                 catch (IndexOutOfBoundsException e)
                 {
-                    throw new NoSuchElementException(e.getMessage());
+                    throw createNoSuchElementException(e);
                 }
             }
         }
@@ -109,9 +112,19 @@ abstract class Text<T extends Text<T>>
             }
 
             @Override
+            @SuppressWarnings("java:S2272")
             public Character next()
             {
-                return array[position++];
+                try
+                {
+                    char result = array[position];
+                    position++;
+                    return result;
+                }
+                catch (ArrayIndexOutOfBoundsException e)
+                {
+                    throw createNoSuchElementException(e);
+                }
             }
         }
 
@@ -195,6 +208,13 @@ abstract class Text<T extends Text<T>>
             }
             return contents;
         }
+    }
+
+    private static NoSuchElementException createNoSuchElementException(Exception cause)
+    {
+        NoSuchElementException exception = new NoSuchElementException(cause.getMessage());
+        exception.initCause(cause);
+        return exception;
     }
 
     /**

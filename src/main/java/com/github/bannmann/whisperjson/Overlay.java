@@ -7,9 +7,10 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 
+import com.github.mizool.core.exception.CodeInconsistencyException;
 import com.google.common.annotations.VisibleForTesting;
 
-abstract class Overlay<T extends Text<T>>
+class Overlay<T extends Text<T>>
 {
     public static final class Exposed extends Overlay<Text.Exposed>
     {
@@ -54,7 +55,7 @@ abstract class Overlay<T extends Text<T>>
     private static final int TYPE = 0;
     private static final int FROM = 1;
     private static final int TO = 2;
-    private static final int NESTED = 3;
+    private static final int CHILD_COUNT = 3;
 
     @Getter
     protected final T text;
@@ -72,9 +73,9 @@ abstract class Overlay<T extends Text<T>>
         return Type.values()[getComponent(element, TYPE)];
     }
 
-    public int getNested(int element)
+    public int getChildCount(int element)
     {
-        return getComponent(element, NESTED);
+        return getComponent(element, CHILD_COUNT);
     }
 
     public T getJson(int element)
@@ -90,7 +91,19 @@ abstract class Overlay<T extends Text<T>>
     public T getUnescapedText(int element)
     {
         T value = text.getPart(getComponent(element, FROM) + 1, getComponent(element, TO));
-        return (getType(element) == Type.STRING_ESCAPED) ? value.unescape() : value;
+        if (getType(element) == Type.STRING_ESCAPED)
+        {
+            try
+            {
+                return value.unescape();
+            }
+            catch (JsonSyntaxException e)
+            {
+                // Should have occurred during initial parsing
+                throw new CodeInconsistencyException(e);
+            }
+        }
+        return value;
     }
 
     private int getComponent(int element, int offset)
@@ -103,7 +116,12 @@ abstract class Overlay<T extends Text<T>>
         return blocks.get((element * 4) / blockSize);
     }
 
-    public void createElement(int element, Type type, int from, int to, int nested)
+    public void createLeafElement(int element, Type type, int from, int to)
+    {
+        createElement(element, type, from, to, 0);
+    }
+
+    private void createElement(int element, Type type, int from, int to, int childCount)
     {
         int currentBlock = (element * 4) / blockSize;
         if (currentBlock == blocks.size())
@@ -115,7 +133,7 @@ abstract class Overlay<T extends Text<T>>
         block[index] = type.ordinal();
         block[index + FROM] = from;
         block[index + TO] = to;
-        block[index + NESTED] = nested;
+        block[index + CHILD_COUNT] = childCount;
     }
 
     private int getBlockIndex(int element)
@@ -123,11 +141,16 @@ abstract class Overlay<T extends Text<T>>
         return (element * 4) % blockSize;
     }
 
-    public void closeElement(int element, int to, int nested)
+    public void openStructureElement(int nextElementNumber, Type type, int pos)
+    {
+        createElement(nextElementNumber, type, pos, -1, -1);
+    }
+
+    public void closeStructureElement(int element, int to, int childCount)
     {
         int[] block = getBlock(element);
         int index = getBlockIndex(element);
         block[index + TO] = to;
-        block[index + NESTED] = nested;
+        block[index + CHILD_COUNT] = childCount;
     }
 }

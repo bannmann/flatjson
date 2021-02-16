@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class UnescapeTest
+public class TestUnescaping
 {
     @Test(dataProvider = "noUnescapingNeeded")
     public void doNotUnescape(String label, String input)

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.annotations.Test;
 
-public class EqualityTest
+public class TestTextEquality
 {
     @Test
     public void implementationEquality()

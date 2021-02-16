@@ -10,7 +10,7 @@ import java.util.Map;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class JsonTest
+public class TestWhisperJson
 {
     @Test
     public void parseJsonNull()

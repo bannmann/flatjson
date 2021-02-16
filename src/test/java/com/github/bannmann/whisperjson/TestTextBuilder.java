@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.annotations.Test;
 
-public class TextBuilderTest
+public class TestTextBuilder
 {
     @Test
     public void test()
