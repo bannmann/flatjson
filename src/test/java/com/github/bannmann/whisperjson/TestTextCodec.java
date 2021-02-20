@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class TestUnescaping
+public class TestTextCodec
 {
     @Test(dataProvider = "noUnescapingNeeded")
     public void doNotUnescape(String label, String input)
@@ -52,7 +52,8 @@ public class TestUnescaping
 
     private String invokeUnescape(String s)
     {
-        return new Text.Exposed(s).unescape()
+        final Text.Exposed original = new Text.Exposed(s);
+        return TextCodec.unescape(original, chars -> new Text.Exposed(new String(chars)))
             .asString();
     }
 }

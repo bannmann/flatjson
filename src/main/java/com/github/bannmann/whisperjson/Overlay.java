@@ -3,6 +3,7 @@ package com.github.bannmann.whisperjson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -10,13 +11,19 @@ import lombok.NonNull;
 import com.github.mizool.core.exception.CodeInconsistencyException;
 import com.google.common.annotations.VisibleForTesting;
 
-class Overlay<T extends Text<T>>
+abstract class Overlay<T extends Text<T>>
 {
     public static final class Exposed extends Overlay<Text.Exposed>
     {
         public Exposed(@NonNull String raw)
         {
             super(new Text.Exposed(raw));
+        }
+
+        @Override
+        protected Function<char[], Text.Exposed> getTextConstructor()
+        {
+            return chars -> new Text.Exposed(new String(chars));
         }
     }
 
@@ -30,6 +37,12 @@ class Overlay<T extends Text<T>>
         public Safe(@NonNull Text.Safe text)
         {
             super(text);
+        }
+
+        @Override
+        protected Function<char[], Text.Safe> getTextConstructor()
+        {
+            return Text.Safe::new;
         }
 
         @Override
@@ -95,7 +108,7 @@ class Overlay<T extends Text<T>>
         {
             try
             {
-                return value.unescape();
+                return TextCodec.unescape(value, getTextConstructor());
             }
             catch (JsonSyntaxException e)
             {
@@ -105,6 +118,8 @@ class Overlay<T extends Text<T>>
         }
         return value;
     }
+
+    protected abstract Function<char[], T> getTextConstructor();
 
     private int getComponent(int element, int offset)
     {

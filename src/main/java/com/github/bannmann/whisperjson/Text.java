@@ -83,18 +83,6 @@ abstract class Text<T extends Text<T>>
         {
             return new CharacterIterator(contents);
         }
-
-        @Override
-        protected Exposed newInstance(char[] chars)
-        {
-            return new Exposed(new String(chars));
-        }
-
-        @Override
-        protected Exposed self()
-        {
-            return this;
-        }
     }
 
     public static class Safe extends Text<Safe> implements AutoCloseable
@@ -182,18 +170,6 @@ abstract class Text<T extends Text<T>>
         }
 
         @Override
-        protected Safe newInstance(@NonNull char[] chars)
-        {
-            return new Safe(chars);
-        }
-
-        @Override
-        protected Safe self()
-        {
-            return this;
-        }
-
-        @Override
         public void close()
         {
             Credentials.wipe(contents);
@@ -265,134 +241,5 @@ abstract class Text<T extends Text<T>>
             result = 37 * result + (int) chars.next();
         }
         return result;
-    }
-
-    public T escape()
-    {
-        try (TextBuilder result = new TextBuilder(length()))
-        {
-            boolean returnSelf = true;
-            int i = 0;
-            while (i < length())
-            {
-                char c = charAt(i);
-                boolean didEscape = true;
-                switch (c)
-                {
-                    case '\\':
-                        result.append('\\', '\\');
-                        break;
-                    case '"':
-                        result.append('\\', '\"');
-                        break;
-                    case '\b':
-                        result.append('\\', 'b');
-                        break;
-                    case '\f':
-                        result.append('\\', 'f');
-                        break;
-                    case '\n':
-                        result.append('\\', 'n');
-                        break;
-                    case '\r':
-                        result.append('\\', 'r');
-                        break;
-                    case '\t':
-                        result.append('\\', 't');
-                        break;
-                    default:
-                        if (c < 32 || c > 126)
-                        {
-                            result.append('\\', 'u');
-                            result.append(Integer.toUnsignedString(c, 16));
-                        }
-                        else
-                        {
-                            didEscape = false;
-                            result.append(c);
-                        }
-                }
-                if (didEscape)
-                {
-                    returnSelf = false;
-                }
-                i++;
-            }
-
-            if (returnSelf)
-            {
-                return self();
-            }
-
-            return result.build(this::newInstance);
-        }
-    }
-
-    protected abstract T self();
-
-    protected abstract T newInstance(char[] chars);
-
-    public T unescape()
-    {
-        try (TextBuilder result = new TextBuilder(length()))
-        {
-            boolean returnSelf = true;
-            int i = 0;
-            while (i < length())
-            {
-                char c = charAt(i);
-                if (c == '\\')
-                {
-                    returnSelf = false;
-                    i++;
-                    char escapeChar = charAt(i);
-                    switch (escapeChar)
-                    {
-                        case '\\':
-                            result.append('\\');
-                            break;
-                        case '/':
-                            result.append('/');
-                            break;
-                        case '"':
-                            result.append('"');
-                            break;
-                        case 'b':
-                            result.append('\b');
-                            break;
-                        case 'f':
-                            result.append('\f');
-                            break;
-                        case 'n':
-                            result.append('\n');
-                            break;
-                        case 'r':
-                            result.append('\r');
-                            break;
-                        case 't':
-                            result.append('\t');
-                            break;
-                        case 'u':
-                            result.append(Character.toChars(Integer.parseInt(getPart(i + 1, i + 5).asString(), 16)));
-                            i += 4;
-                            break;
-                        default:
-                            throw new JsonSyntaxException("illegal escape char", escapeChar, i);
-                    }
-                }
-                else
-                {
-                    result.append(c);
-                }
-                i++;
-            }
-
-            if (returnSelf)
-            {
-                return self();
-            }
-
-            return result.build(this::newInstance);
-        }
     }
 }
