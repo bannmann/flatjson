@@ -21,10 +21,12 @@ public class TestSafeJson
     private static final char[] EXPECTED_PASSWORD = { 's', '5', '6', 'q', 'v', 'Q', 'U', 'P', 'v', 'U', 'v', 'Q', '7' };
 
     private char[] inputCharacters;
+    private WhisperJson whisperJson;
 
     @BeforeMethod
     public void setUp() throws IOException
     {
+        whisperJson = new WhisperJson();
         inputCharacters = getTestDataArray();
 
         assertThat(inputCharacters.length > 0).isTrue();
@@ -57,7 +59,7 @@ public class TestSafeJson
     @Test
     public void dataAccess()
     {
-        try (SafeJson root = WhisperJson.parse(inputCharacters);
+        try (SafeJson root = whisperJson.parse(inputCharacters);
              SafeJson username = root.asObject()
                  .get("username");
              SafeJson password = root.asObject()
@@ -82,8 +84,8 @@ public class TestSafeJson
     @Test
     public void consumeReader() throws IOException
     {
-        try (SafeJson fromArray = WhisperJson.parse(inputCharacters);
-             SafeJson fromReader = WhisperJson.parse(getTestDataReader()))
+        try (SafeJson fromArray = whisperJson.parse(inputCharacters);
+             SafeJson fromReader = whisperJson.parse(getTestDataReader()))
         {
             assertThat(fromReader).isEqualTo(fromArray);
         }
@@ -92,8 +94,8 @@ public class TestSafeJson
     @Test
     public void consumeStream() throws IOException
     {
-        try (SafeJson fromArray = WhisperJson.parse(inputCharacters);
-             SafeJson fromInputStream = WhisperJson.parse(getTestDataInputStream(), StandardCharsets.UTF_8))
+        try (SafeJson fromArray = whisperJson.parse(inputCharacters);
+             SafeJson fromInputStream = whisperJson.parse(getTestDataInputStream(), StandardCharsets.UTF_8))
         {
             assertThat(fromInputStream).isEqualTo(fromArray);
         }
@@ -102,7 +104,7 @@ public class TestSafeJson
     @Test
     public void rootInputWiped()
     {
-        try (SafeJson root = WhisperJson.parse(inputCharacters);
+        try (SafeJson root = whisperJson.parse(inputCharacters);
              SafeJson password = root.asObject()
                  .get("password"))
         {
@@ -118,7 +120,7 @@ public class TestSafeJson
     @Test
     public void copiedTextWiped()
     {
-        try (SafeJson root = WhisperJson.parse(inputCharacters);
+        try (SafeJson root = whisperJson.parse(inputCharacters);
              SafeJson passwordElement = root.asObject()
                  .get("password"))
         {
@@ -145,7 +147,7 @@ public class TestSafeJson
     @Test
     public void transitiveClose()
     {
-        SafeJson root = WhisperJson.parse(inputCharacters);
+        SafeJson root = whisperJson.parse(inputCharacters);
         SafeJson passwordElement = root.asObject()
             .get("password");
         root.close();
@@ -156,7 +158,7 @@ public class TestSafeJson
     @Test
     public void rootInputNotWipedPrematurely()
     {
-        try (SafeJson root = WhisperJson.parse(inputCharacters))
+        try (SafeJson root = whisperJson.parse(inputCharacters))
         {
             root.asObject()
                 .get("password")

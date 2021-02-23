@@ -2,15 +2,24 @@ package com.github.bannmann.whisperjson;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class TestStringParsing
 {
+    private WhisperJson whisperJson;
+
+    @BeforeMethod
+    public void setUp()
+    {
+        whisperJson = new WhisperJson();
+    }
+
     @Test(dataProvider = "strings")
     public void parseString(String label, String input, String expected)
     {
-        ExposedJson json = WhisperJson.parse(input);
+        ExposedJson json = whisperJson.parse(input);
         assertThat(json).returns(true, Json::isString)
             .returns(expected, ExposedJson::asString);
     }
@@ -36,7 +45,7 @@ public class TestStringParsing
     @Test(dataProvider = "malformedStrings", expectedExceptions = JsonSyntaxException.class)
     public void parseFailure(String label, String input)
     {
-        WhisperJson.parse(input);
+        whisperJson.parse(input);
     }
 
     @DataProvider

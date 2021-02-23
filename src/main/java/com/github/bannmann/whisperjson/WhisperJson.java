@@ -7,9 +7,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 import lombok.NonNull;
-import lombok.experimental.UtilityClass;
 
-@UtilityClass
 public class WhisperJson
 {
     /**
@@ -22,7 +20,7 @@ public class WhisperJson
      * @throws JsonSyntaxException if there is a JSON syntax error
      * @throws NullPointerException if {@code raw} is {@code null}
      */
-    public static ExposedJson parse(@NonNull String raw)
+    public ExposedJson parse(@NonNull String raw)
     {
         return parse(new Factory.Exposed(), new Overlay.Exposed(raw));
     }
@@ -38,7 +36,7 @@ public class WhisperJson
      * @throws JsonSyntaxException if there is a JSON syntax error
      * @throws NullPointerException if {@code raw} is {@code null}
      */
-    public static SafeJson parse(@NonNull char[] raw)
+    public SafeJson parse(@NonNull char[] raw)
     {
         // We don't close the overlay or factory as the SafeJson will close them
         Overlay.Safe overlay = new Overlay.Safe(raw);
@@ -47,7 +45,7 @@ public class WhisperJson
     }
 
     @SuppressWarnings("java:S2095")
-    private static Factory.Safe createSafeFactory()
+    private Factory.Safe createSafeFactory()
     {
         // We don't close the factory as the SafeJson will close it
         return new Factory.Safe();
@@ -66,7 +64,7 @@ public class WhisperJson
      * @throws IOException if an I/O error occurs
      * @throws NullPointerException if {@code reader} is {@code null}
      */
-    public static SafeJson parse(@NonNull Reader reader) throws IOException
+    public SafeJson parse(@NonNull Reader reader) throws IOException
     {
         try (TextBuilder textBuilder = new TextBuilder(250))
         {
@@ -93,7 +91,7 @@ public class WhisperJson
      * @throws IOException if an I/O error occurs
      * @throws NullPointerException if {@code inputStream} or {@code charset} is {@code null}
      */
-    public static SafeJson parse(@NonNull InputStream inputStream, @NonNull Charset charset) throws IOException
+    public SafeJson parse(@NonNull InputStream inputStream, @NonNull Charset charset) throws IOException
     {
         return parse(new InputStreamReader(inputStream, charset));
     }

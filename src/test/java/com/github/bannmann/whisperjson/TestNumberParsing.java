@@ -7,15 +7,24 @@ import static org.assertj.core.api.Assertions.within;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 public class TestNumberParsing
 {
+    private WhisperJson whisperJson;
+
+    @BeforeMethod
+    public void setUp()
+    {
+        whisperJson = new WhisperJson();
+    }
+
     @Test(dataProvider = "intVariants")
     public void parseInt(String label, String input, int expected)
     {
-        ExposedJson json = WhisperJson.parse(input);
+        ExposedJson json = whisperJson.parse(input);
 
         assertThat(json).returns(true, Json::isNumber);
         assertThat(json.asInt()).isEqualTo(expected);
@@ -36,7 +45,7 @@ public class TestNumberParsing
     @Test(dataProvider = "longVariants")
     public void parseLong(String label, String input, long expected)
     {
-        ExposedJson json = WhisperJson.parse(input);
+        ExposedJson json = whisperJson.parse(input);
 
         assertThat(json).returns(true, Json::isNumber);
         assertThat(json.asLong()).isEqualTo(expected);
@@ -54,7 +63,7 @@ public class TestNumberParsing
     @Test(dataProvider = "doubleVariants")
     public void parseDouble(String label, String input, double expected)
     {
-        ExposedJson json = WhisperJson.parse(input);
+        ExposedJson json = whisperJson.parse(input);
 
         assertThat(json).returns(true, Json::isNumber);
         assertThat(json.asDouble()).isCloseTo(expected, within(0.0));
@@ -80,7 +89,7 @@ public class TestNumberParsing
     @Test(dataProvider = "floatVariants")
     public void parseFloat(String label, String input, double expected)
     {
-        ExposedJson json = WhisperJson.parse("3.141");
+        ExposedJson json = whisperJson.parse("3.141");
 
         assertThat(json).returns(true, Json::isNumber);
         assertThat((double) json.asFloat()).isCloseTo(3.141, within(0.001));
@@ -101,7 +110,7 @@ public class TestNumberParsing
     @Test
     public void parseBigDecimal()
     {
-        ExposedJson json = WhisperJson.parse(
+        ExposedJson json = whisperJson.parse(
             "3.141592653589793238462643383279502884197169399375105820974944592307816406286");
 
         assertThat(json).returns(true, Json::isNumber);
@@ -112,7 +121,7 @@ public class TestNumberParsing
     @Test
     public void parseBigInteger()
     {
-        ExposedJson json = WhisperJson.parse(
+        ExposedJson json = whisperJson.parse(
             "141592653589793238462643383279502884197169399375105820974944592307816406286");
 
         assertThat(json).returns(true, Json::isNumber);
@@ -123,7 +132,7 @@ public class TestNumberParsing
     @Test(dataProvider = "malformedNumbers")
     public void parseMalformedNumbers(String label, String input, String expectedMessage)
     {
-        assertThatExceptionOfType(JsonSyntaxException.class).isThrownBy(() -> WhisperJson.parse(input))
+        assertThatExceptionOfType(JsonSyntaxException.class).isThrownBy(() -> whisperJson.parse(input))
             .withMessage(expectedMessage);
     }
 
