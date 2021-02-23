@@ -128,7 +128,7 @@ abstract class Element<J extends Json<J>, O extends Overlay<?>> implements Json<
     }
 
     /**
-     * @return an immutable map with the contents of this object. May be empty, but never {@code null}.
+     * @return an immutable map with the contents of this JSON object. May be empty, but never {@code null}.
      */
     @Override
     public Map<String, J> asObject()

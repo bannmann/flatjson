@@ -1,7 +1,7 @@
 package com.github.bannmann.whisperjson;
 
 /**
- * TODO document
+ * Thrown when the application attempted to read a JSON value that is not of the required type.
  */
 public class TypeMismatchException extends RuntimeException
 {

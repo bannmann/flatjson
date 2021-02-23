@@ -5,14 +5,14 @@
     <parent>
         <groupId>com.github.bannmann</groupId>
         <artifactId>base</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.3-SNAPSHOT</version>
     </parent>
 
     <groupId>com.github.bannmann.whisperjson</groupId>
     <artifactId>whisperjson</artifactId>
     <version>0.1-SNAPSHOT</version>
 
-    <name>${project.groupId}:${project.artifactId}</name>
+    <name>WhisperJson</name>
     <url>https://github.com/bannmann/whisperjson</url>
 
     <scm>
@@ -84,6 +84,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
                         <sourcepath>${javadoc.sources.directory}</sourcepath>
+                        <doclint>none</doclint>
                     </configuration>
                 </plugin>
             </plugins>
@@ -115,6 +116,9 @@
                                         <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
                                         <outputDirectory>${javadoc.sources.directory}</outputDirectory>
                                         <addOutputDirectory>false</addOutputDirectory>
+                                        <formatPreferences>
+                                            <javaLangAsFQN>skip</javaLangAsFQN>
+                                        </formatPreferences>
                                     </configuration>
                                 </execution>
                             </executions>

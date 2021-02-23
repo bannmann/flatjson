@@ -8,70 +8,101 @@ import java.util.Optional;
 
 import lombok.NonNull;
 
+/**
+ * Element of a JSON tree that was parsed without creating {@link String} instances. <br>
+ * <br>
+ * See {@link Json} for usage information.
+ */
 public interface SafeJson extends Json<SafeJson>, AutoCloseable
 {
     /**
+     * @throws TypeMismatchException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     boolean asBoolean();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
+     * @throws NumberFormatException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     int asInt();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
+     * @throws NumberFormatException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     long asLong();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
+     * @throws NumberFormatException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     float asFloat();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
+     * @throws NumberFormatException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     double asDouble();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
+     * @throws NumberFormatException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     BigInteger asBigInteger();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
+     * @throws NumberFormatException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     BigDecimal asBigDecimal();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     List<SafeJson> asArray();
 
     /**
+     * @throws TypeMismatchException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     Map<String, SafeJson> asObject();
 
     /**
+     * @throws NullPointerException {@inheritDoc}
+     * @throws TypeMismatchException {@inheritDoc}
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      */
     @Override
     Optional<SafeJson> getObjectProperty(@NonNull String name);
 
     /**
-     * @return a new array with a copy of the contents of this JSON string
+     * Gets the characters contained in this string. The returned array should be wiped immediately after use.
+     *
+     * @return a copy of the contents of this JSON string. May be empty, but never {@code null}.
+     *
+     * @throws IllegalStateException if this JSON element does not represent a non-{@code null} string
+     * @throws TypeMismatchException if this JSON element does not represent a non-{@code null} string
+     * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
+     * @see Json#isString()
+     * @see SafeJson#asSensitiveText()
+     * @see ExposedJson#asString()
      */
     char[] asCharArray();
 
@@ -82,8 +113,10 @@ public interface SafeJson extends Json<SafeJson>, AutoCloseable
      * @return a copy of the contents of this JSON string. May be empty, but never {@code null}.
      *
      * @throws TypeMismatchException if this JSON element does not represent a non-{@code null} string
+     * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      * @see Json#isString()
      * @see #asCharArray()
+     * @see ExposedJson#asString()
      */
     SensitiveText asSensitiveText();
 
@@ -98,7 +131,7 @@ public interface SafeJson extends Json<SafeJson>, AutoCloseable
      * Closing a non-root string element will wipe any characters cached by that instance, but will not affect other
      * elements or the JSON source text.<br>
      * <br>
-     * Closing any other element will not have any effect and will not cause that instance to throw
+     * Invoking this method on any other element will not have any effect and will not cause that instance to throw
      * {@link IllegalStateException IllegalStateExceptions} on subsequent calls of other methods.<br>
      * <br>
      * Calling {@code close()} repeatedly has no effect.

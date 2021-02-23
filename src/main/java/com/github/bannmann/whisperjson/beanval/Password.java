@@ -15,7 +15,7 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * The password must have at least the specified number of characters.<br>
+ * The annotated element must have at least the specified number of characters.<br>
  * <br>
  * Supported types are:
  * <ul>

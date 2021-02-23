@@ -1,5 +1,8 @@
 package com.github.bannmann.whisperjson;
 
+/**
+ * Thrown to indicate a syntax error in the supplied JSON source text.
+ */
 public class JsonSyntaxException extends RuntimeException
 {
     JsonSyntaxException(String message, int index)

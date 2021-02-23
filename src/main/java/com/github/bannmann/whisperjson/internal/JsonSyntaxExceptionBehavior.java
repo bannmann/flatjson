@@ -7,6 +7,9 @@ import com.github.mizool.core.rest.errorhandling.ErrorHandlingBehavior;
 import com.github.mizool.core.rest.errorhandling.HttpStatus;
 import com.github.mizool.core.rest.errorhandling.LogLevel;
 
+/**
+ * Maps {@link JsonSyntaxException} to HTTP Status 400 and provides error details to the client.
+ */
 @MetaInfServices
 public class JsonSyntaxExceptionBehavior implements ErrorHandlingBehavior
 {

@@ -7,6 +7,9 @@ import com.github.mizool.core.rest.errorhandling.ErrorHandlingBehavior;
 import com.github.mizool.core.rest.errorhandling.HttpStatus;
 import com.github.mizool.core.rest.errorhandling.LogLevel;
 
+/**
+ * Maps {@link TypeMismatchException} to HTTP Status 422 and provides error details to the client.
+ */
 @MetaInfServices
 public class TypeMismatchExceptionBehavior implements ErrorHandlingBehavior
 {

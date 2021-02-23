@@ -6,6 +6,9 @@ import javax.validation.ValidationException;
 
 import com.github.bannmann.whisperjson.SensitiveText;
 
+/**
+ * Implements {@link Password} validation.
+ */
 public class CheckPassword implements ConstraintValidator<Password, Object>
 {
     private boolean mandatory;

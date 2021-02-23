@@ -8,8 +8,19 @@ import java.nio.charset.Charset;
 
 import lombok.NonNull;
 
+/**
+ * Parses JSON source text.
+ */
 public class WhisperJson
 {
+    /**
+     * Creates a {@code WhisperJson} instance.
+     */
+    public WhisperJson()
+    {
+        // Nothing special to do; this explicit constructor only exists because of its Javadoc comment.
+    }
+
     /**
      * Parses the given string.
      *
