@@ -10,7 +10,7 @@
 
     <groupId>com.github.bannmann.whisperjson</groupId>
     <artifactId>whisperjson</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
 
     <name>WhisperJson</name>
     <url>https://github.com/bannmann/whisperjson</url>
