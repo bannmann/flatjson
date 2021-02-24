@@ -17,11 +17,15 @@ Unfortunately, for login or signup operations in REST APIs, commonly used JSON p
 always create `String` instances for any JSON string property - even when you use an object mapping facility to map it
 to a `char[]` field.
 
-WhisperJson takes a different approach: it only creates objects when necessary. Parsing an `InputStream`, `Reader` or
-character array results in a `SafeJson` object which wipes the JSON source text from memory when it is closed.
-Additionally, `SafeJson` does not allow access to JSON string properties via `String` instances, but only via character
-arrays (which the calling code can wipe after use) or instances of the specialized `SensitiveText` class (which
-implements `AutoCloseable`).
+WhisperJson takes a different approach: it only creates objects when necessary.
+[Parsing](https://javadoc.io/doc/com.github.bannmann.whisperjson/whisperjson/latest/com/github/bannmann/whisperjson/WhisperJson.html)
+an `InputStream`, `Reader` or character array results in a `SafeJson` object which wipes the JSON source text from
+memory when it is closed. Additionally, `SafeJson` does not allow access to JSON string properties via `String`
+instances, but only via character arrays (which the calling code can wipe after use) or instances of the specialized
+[`SensitiveText`](https://javadoc.io/doc/com.github.bannmann.whisperjson/whisperjson/latest/com/github/bannmann/whisperjson/SensitiveText.html)
+class (which implements `AutoCloseable`).
+
+For details, see the latest [Javadoc](https://javadoc.io/doc/com.github.bannmann.whisperjson/whisperjson/latest/index.html).
 
 ## Acknowledgements
 
