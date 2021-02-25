@@ -97,7 +97,6 @@ public interface SafeJson extends Json<SafeJson>, AutoCloseable
      *
      * @return a copy of the contents of this JSON string. May be empty, but never {@code null}.
      *
-     * @throws IllegalStateException if this JSON element does not represent a non-{@code null} string
      * @throws TypeMismatchException if this JSON element does not represent a non-{@code null} string
      * @throws IllegalStateException if this instance or the underlying JSON tree has been {@link #close() closed}.
      * @see Json#isString()
