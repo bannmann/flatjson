@@ -15,7 +15,7 @@ import lombok.NonNull;
  * methods to access the value.<br>
  * <br>
  * Note that an element representing a JSON null literal will return {@code false} for all detection methods except
- * {@link #isNull()} and throw an {@link TypeMismatchException} for all value access methods.<br>
+ * {@link #isNull()} and throw a {@link TypeMismatchException} for all value access methods.<br>
  * <br>
  * <style type="text/css">
  * table.whisperjson, table.whisperjson td, table.whisperjson th { border: 1px solid black; }

@@ -106,7 +106,7 @@ public interface SafeJson extends Json<SafeJson>, AutoCloseable
     char[] asCharArray();
 
     /**
-     * Gets the contents of this string as a {@link SensitiveText}. The returned {@code SensitiveText} must be closed
+     * Gets the contents of this string as a {@link SensitiveText}. The returned {@code SensitiveText} must be
      * {@link #close() closed} separately from this instance.
      *
      * @return a copy of the contents of this JSON string. May be empty, but never {@code null}.
